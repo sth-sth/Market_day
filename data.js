@@ -45,42 +45,90 @@ const i18n = {
     }
 };
 
-// All 11 topics carefully mapped from the standard SCoC PDF
-const buckets = [
-    { id: 'leg', label_en: 'Legal', label_zh: '法律合規', icon: '⚖️', color: '#ff4d4d' },
-    { id: 'eth', label_en: 'Ethics', label_zh: '商業道德', icon: '🤝', color: '#ff9f43' },
-    { id: 'cyb', label_en: 'Cyber', label_zh: '網絡安全', icon: '💻', color: '#0abde3' },
-    { id: 'qas', label_en: 'Quality', label_zh: '質量與安全', icon: '🛡️', color: '#10ac84' },
-    { id: 'env', label_en: 'Environment', label_zh: '環境管理', icon: '🌿', color: '#1dd1a1' },
-    { id: 'cli', label_en: 'Climate', label_zh: '氣候變化', icon: '🌡️', color: '#feca57' },
-    { id: 'ehs', label_en: 'Health', label_zh: '健康與安全', icon: '👷', color: '#ff6b6b' },
-    { id: 'lab', label_en: 'Labour', label_zh: '勞工與人權', icon: '👥', color: '#ee5253' },
-    { id: 'div', label_en: 'Diversity', label_zh: '多元與包容', icon: '🌈', color: '#f368e0' },
-    { id: 'com', label_en: 'Community', label_zh: '社區關係', icon: '🏘️', color: '#82ccdd' },
-    { id: 'sup', label_en: 'Supply Chain', label_zh: '供應鏈管理', icon: '🔗', color: '#9b59b6' }
+const TOPICS = [
+    'Legal Compliance',
+    'Business Ethics',
+    'Cybersecurity',
+    'Quality and Safety',
+    'Environmental Management',
+    'Climate Change',
+    'Employee Health and Safety',
+    'Labour Practices and Human Rights',
+    'Diversity and Inclusion',
+    'Community Relations',
+    'Supply Chain Management'
 ];
 
-const cardsData = [
-    { bucket: 'leg', tag_en: 'Notice', tag_zh: '通知', text_en: 'Sanctions risk hidden', text_zh: '隱瞞國際制裁風險', feedback_en: 'Sanctions = Legal', feedback_zh: '制裁風險屬於法律合規' },
-    { bucket: 'leg', tag_en: 'Audit', tag_zh: '審計', text_en: 'Anti-competition pact', text_zh: '簽署反競爭協議', feedback_en: 'Fair play is Legal', feedback_zh: '公平競爭是法律義務' },
-    { bucket: 'eth', tag_en: 'Email', tag_zh: '機密', text_en: 'Secret gift to manager', text_zh: '私下向採購送豪華禮物', feedback_en: 'Gifts = Ethics', feedback_zh: '送禮涉及商業道德' },
-    { bucket: 'eth', tag_en: 'Alert', tag_zh: '警告', text_en: 'Undisclosed conflict of interest', text_zh: '未披露強烈利益衝突', feedback_en: 'CoI = Ethics', feedback_zh: '利益衝突需第一時間申報' },
-    { bucket: 'cyb', tag_en: 'Incident', tag_zh: '事件', text_en: 'Customer data leaked online', text_zh: '洩漏大量客戶隱私數據', feedback_en: 'Data leak = Cyber', feedback_zh: '數據洩漏是網絡安全紅線' },
-    { bucket: 'cyb', tag_en: 'Alert', tag_zh: '警告', text_en: 'Supplier account hacked', text_zh: '供應商內部系統被黑客入侵', feedback_en: 'Hack = Cyber', feedback_zh: '賬號被黑危及網絡安全' },
-    { bucket: 'qas', tag_en: 'Defect', tag_zh: '缺陷', text_en: 'Product fails safety test', text_zh: '交付產品未通過安全測試', feedback_en: 'Testing = Quality', feedback_zh: '測試與質量安全息息相關' },
-    { bucket: 'qas', tag_en: 'Report', tag_zh: '報告', text_en: 'Counterfeit materials used', text_zh: '違規使用假冒替代材料', feedback_en: 'Counterfeit = Quality', feedback_zh: '假冒材料嚴重影響質量' },
-    { bucket: 'env', tag_en: 'Site', tag_zh: '現場', text_en: 'Chemical spill in river', text_zh: '有毒化學品直接洩漏至河流', feedback_en: 'Spill = Environment', feedback_zh: '化學洩漏屬環境管理範疇' },
-    { bucket: 'env', tag_en: 'Audit', tag_zh: '審計', text_en: 'Illegal waste dumping', text_zh: '夜間非法傾倒工業廢物', feedback_en: 'Waste = Environment', feedback_zh: '違法排污必須嚴打' },
-    { bucket: 'cli', tag_en: 'ESG', tag_zh: '指標', text_en: 'No carbon reduction goal', text_zh: '未設立任何減碳或排零目標', feedback_en: 'Carbon = Climate Change', feedback_zh: '減碳目標攸關氣候變化' },
-    { bucket: 'cli', tag_en: 'Report', tag_zh: '報告', text_en: 'Refuse emission reporting', text_zh: '拒絕透明匯報溫室氣體排放', feedback_en: 'Emissions = Climate', feedback_zh: '碳牌放報告屬氣候變化準則' },
-    { bucket: 'ehs', tag_en: 'Site', tag_zh: '現場', text_en: 'Lack of safety harness', text_zh: '高空作業人員未配備安全帶', feedback_en: 'Worker Safety = EHS', feedback_zh: '高空墜落風險屬健康安全' },
-    { bucket: 'ehs', tag_en: 'Alert', tag_zh: '警告', text_en: 'Toxic fume exposure', text_zh: '車間工人長時間暴露於毒氣', feedback_en: 'Hazards = EHS', feedback_zh: '職業病危害屬健康與安全' },
-    { bucket: 'lab', tag_en: 'Audit', tag_zh: '突擊', text_en: '15-year-old on night shift', text_zh: '驚現15歲童工違規值夜班', feedback_en: 'Child Labour = Rights', feedback_zh: '禁止童工是勞工人權底線' },
-    { bucket: 'lab', tag_en: 'Alert', tag_zh: '警告', text_en: 'Passports confiscated', text_zh: '管理層強行扣押外勞護照', feedback_en: 'Forced Labour = Rights', feedback_zh: '強迫勞動絕對不可接受' },
-    { bucket: 'div', tag_en: 'HR', tag_zh: '人力', text_en: 'Refusing to hire minorities', text_zh: '公開拒絕面試少數族裔', feedback_en: 'Discrimination = Diversity', feedback_zh: '系統性歧視違反包容性原則' },
-    { bucket: 'div', tag_en: 'Report', tag_zh: '報告', text_en: 'Gender pay gap ignored', text_zh: '管理層無視嚴重性別薪酬差異', feedback_en: 'Pay gap = Diversity', feedback_zh: '同工同酬屬多元化管理' },
-    { bucket: 'com', tag_en: 'News', tag_zh: '投訴', text_en: 'Noise disrupts local school', text_zh: '全天施工噪音嚴重干擾學校', feedback_en: 'Local impact = Community', feedback_zh: '鄰避效應需妥善處理社區關係' },
-    { bucket: 'com', tag_en: 'Alert', tag_zh: '警告', text_en: 'Ignoring village complaints', text_zh: '粗暴無視周邊村民訴求', feedback_en: 'Grievance = Community', feedback_zh: '無視訴求會破壞社區關係' },
-    { bucket: 'sup', tag_en: 'Audit', tag_zh: '審查', text_en: 'No sub-contractor checks', text_zh: '從不審查下層分包商風險', feedback_en: 'Sub-tier = Supply Chain', feedback_zh: '層層落實屬供應鏈管理' },
-    { bucket: 'sup', tag_en: 'Notice', tag_zh: '通知', text_en: 'Buying from sanctioned mine', text_zh: '向受制裁高風險礦場採購', feedback_en: 'Sourcing = Supply Chain', feedback_zh: '負責任採購是供應鏈義務' }
+const CARD_BANK = [
+    { id: 'LC01', text_en: 'Follow local laws where you operate.', text_zh: '遵守營運地法律法規。', topic: 'Legal Compliance', type: 'Must' },
+    { id: 'LC02', text_en: 'Ensure exports meet destination regulations.', text_zh: '出口產品符合目的地法規。', topic: 'Legal Compliance', type: 'Must' },
+
+    { id: 'BE01', text_en: 'Operate honestly, transparently, and professionally.', text_zh: '以誠信、透明、專業方式營運。', topic: 'Business Ethics', type: 'Must' },
+    { id: 'BE02', text_en: 'Do not offer gifts or benefits to CLP staff.', text_zh: '不得向 CLP 員工提供金錢或利益。', topic: 'Business Ethics', type: 'Must' },
+
+    { id: 'CY01', text_en: "Help protect CLP's digital assets.", text_zh: '共同保護 CLP 數碼資產。', topic: 'Cybersecurity', type: 'Must' },
+    { id: 'CY02', text_en: 'Comply with privacy and information security laws.', text_zh: '遵守私隱及資訊安全法規。', topic: 'Cybersecurity', type: 'Must' },
+
+    { id: 'QS01', text_en: 'Follow applicable safety laws in operations.', text_zh: '業務運作須遵守安全法規。', topic: 'Quality and Safety', type: 'Must' },
+    { id: 'QS02', text_en: 'Run product recall or rectification programs.', text_zh: '發現缺陷時啟動召回或整改。', topic: 'Quality and Safety', type: 'Expectation' },
+
+    { id: 'EM01', text_en: 'Follow environmental laws where you operate.', text_zh: '遵守營運地環境法律法規。', topic: 'Environmental Management', type: 'Must' },
+    { id: 'EM02', text_en: 'Assess environmental aspects and risks.', text_zh: '識別並評估環境因素與風險。', topic: 'Environmental Management', type: 'Expectation' },
+
+    { id: 'CC01', text_en: 'Measure and disclose greenhouse gas emissions.', text_zh: '量度並披露溫室氣體排放。', topic: 'Climate Change', type: 'Expectation' },
+    { id: 'CC02', text_en: 'Set a decarbonisation plan with targets.', text_zh: '制定減碳策略及減排目標。', topic: 'Climate Change', type: 'Expectation' },
+
+    { id: 'EH01', text_en: 'Follow health and safety laws in operations.', text_zh: '業務運作須遵守職安健法規。', topic: 'Employee Health and Safety', type: 'Must' },
+    { id: 'EH02', text_en: 'Identify workplace hazards and mitigate risks.', text_zh: '識別工作危害並落實風險控制。', topic: 'Employee Health and Safety', type: 'Expectation' },
+
+    { id: 'LH01', text_en: 'Zero tolerance for child or forced labour.', text_zh: '對童工及強迫勞動零容忍。', topic: 'Labour Practices and Human Rights', type: 'Must' },
+    { id: 'LH02', text_en: 'Do not hire below legal minimum working age.', text_zh: '不得聘用低於法定最低年齡人士。', topic: 'Labour Practices and Human Rights', type: 'Must' },
+
+    { id: 'DI01', text_en: 'Zero tolerance for discrimination and harassment.', text_zh: '對歧視及騷擾行為零容忍。', topic: 'Diversity and Inclusion', type: 'Must' },
+    { id: 'DI02', text_en: 'Use fair systems for hiring and evaluation.', text_zh: '招聘、薪酬及考核須公平無歧視。', topic: 'Diversity and Inclusion', type: 'Expectation' },
+
+    { id: 'CR01', text_en: 'Keep grievance channels open to communities.', text_zh: '向社區保持公開申訴溝通渠道。', topic: 'Community Relations', type: 'Expectation' },
+    { id: 'CR02', text_en: 'Actively support local communities.', text_zh: '積極支持業務所在地社區。', topic: 'Community Relations', type: 'Expectation' },
+
+    { id: 'SC01', text_en: 'Track upstream suppliers against this Code.', text_zh: '按本守則監察上游供應商表現。', topic: 'Supply Chain Management', type: 'Expectation' },
+    { id: 'SC02', text_en: 'Implement robust upstream supplier programs.', text_zh: '建立完善上游供應商管理計劃。', topic: 'Supply Chain Management', type: 'Expectation' }
 ];
+
+const TOPIC_META = {
+    'Legal Compliance': { id: 'leg', label_zh: '法律合規', icon: '⚖️', color: '#ff4d4d' },
+    'Business Ethics': { id: 'eth', label_zh: '商業道德', icon: '🤝', color: '#ff9f43' },
+    'Cybersecurity': { id: 'cyb', label_zh: '網絡安全', icon: '💻', color: '#0abde3' },
+    'Quality and Safety': { id: 'qas', label_zh: '質量與安全', icon: '🛡️', color: '#10ac84' },
+    'Environmental Management': { id: 'env', label_zh: '環境管理', icon: '🌿', color: '#1dd1a1' },
+    'Climate Change': { id: 'cli', label_zh: '氣候變化', icon: '🌡️', color: '#feca57' },
+    'Employee Health and Safety': { id: 'ehs', label_zh: '員工健康與安全', icon: '👷', color: '#ff6b6b' },
+    'Labour Practices and Human Rights': { id: 'lab', label_zh: '勞工實務與人權', icon: '👥', color: '#ee5253' },
+    'Diversity and Inclusion': { id: 'div', label_zh: '多元與共融', icon: '🌈', color: '#f368e0' },
+    'Community Relations': { id: 'com', label_zh: '社區關係', icon: '🏘️', color: '#82ccdd' },
+    'Supply Chain Management': { id: 'sup', label_zh: '供應鏈管理', icon: '🔗', color: '#9b59b6' }
+};
+
+const buckets = TOPICS.map((topic) => {
+    const meta = TOPIC_META[topic];
+    return {
+        id: meta.id,
+        label_en: topic,
+        label_zh: meta.label_zh,
+        icon: meta.icon,
+        color: meta.color
+    };
+});
+
+const cardsData = CARD_BANK.map((card) => {
+    const bucketMeta = TOPIC_META[card.topic];
+    const zhType = card.type === 'Must' ? '必須' : '期望';
+    return {
+        bucket: bucketMeta.id,
+        tag_en: card.type,
+        tag_zh: zhType,
+        text_en: card.text_en,
+        text_zh: card.text_zh,
+        feedback_en: `Answer: ${card.topic} (${card.id})`,
+        feedback_zh: `答案：${bucketMeta.label_zh}（${card.id}）`
+    };
+});

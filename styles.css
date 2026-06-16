@@ -1,12 +1,12 @@
 :root {
-    --primary: #00ffff; /* Neon cyan */
-    --secondary: #ff00ff; /* Neon magenta */
-    --bg-dark: #0a0515;
+    --primary: #66d9ff;
+    --secondary: #ff7ac8;
+    --bg-dark: #07050f;
     --text-light: #ffffff;
     --danger: #ff4d4d;
     --success: #00e676;
-    --glass-bg: rgba(16, 8, 35, 0.65);
-    --glass-border: rgba(0, 255, 255, 0.2);
+    --glass-bg: rgba(10, 8, 20, 0.78);
+    --glass-border: rgba(140, 220, 255, 0.2);
     --font-main: 'Segoe UI', -apple-system, sans-serif;
 }
 
@@ -18,9 +18,10 @@ body {
     color: var(--text-light);
     height: 100vh; height: 100dvh;
     overflow: hidden; position: fixed; width: 100vw;
-    background: linear-gradient(-45deg, #0e0520, #220d3a, #051937, #1b0a23);
+    background: linear-gradient(-45deg, #080612, #140f25, #081628, #120916);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
+    touch-action: manipulation;
 }
 
 @keyframes gradientBG {
@@ -30,7 +31,7 @@ body {
 }
 
 .app-container {
-    position: relative; width: 100%; height: 100%; maxWidth: 500px; margin: 0 auto;
+    position: relative; width: 100%; height: 100%; max-width: 500px; margin: 0 auto;
     overflow: hidden;
 }
 
@@ -48,7 +49,7 @@ body {
     background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border); border-radius: 20px;
     padding: 30px 20px; text-align: center; width: 90%; max-width: 350px;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), inset 0 0 20px rgba(255, 0, 255, 0.05);
+    box-shadow: 0 0 18px rgba(100, 180, 255, 0.12), inset 0 0 12px rgba(255, 122, 200, 0.04);
 }
 
 .neon-text {
@@ -65,7 +66,7 @@ body {
 .btn:active { transform: scale(0.92); }
 .btn-neon {
     background: transparent; color: var(--primary); border: 2px solid var(--primary);
-    box-shadow: 0 0 10px rgba(0,255,255,0.5), inset 0 0 15px rgba(0,255,255,0.3);
+    box-shadow: 0 0 8px rgba(102, 217, 255, 0.35), inset 0 0 10px rgba(102, 217, 255, 0.2);
     text-shadow: 0 0 5px var(--primary);
 }
 .btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.4); }
@@ -75,6 +76,11 @@ body {
     background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--primary);
     padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold;
     box-shadow: 0 0 8px rgba(0,255,255,0.3);
+    touch-action: manipulation;
+}
+
+.btn, .icon-btn, .close-btn {
+    touch-action: manipulation;
 }
 
 /* Launch Page */
@@ -97,7 +103,19 @@ body {
 .icon-btn { background: none; border: none; font-size: 1.5rem; filter: sepia(1); }
 
 /* Drop Zone & Cards */
-.drop-zone { flex: 1; position: relative; overflow: hidden; perspective: 1000px; }
+.playfield {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.drop-zone {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    perspective: 1000px;
+    background: radial-gradient(circle at 50% 30%, rgba(30, 40, 65, 0.28), rgba(8, 10, 20, 0.85));
+}
 .risk-card {
     position: absolute; width: 220px; padding: 18px;
     background: linear-gradient(135deg, rgba(20, 20, 40, 0.95), rgba(40, 10, 50, 0.95));
@@ -105,30 +123,49 @@ body {
     left: 50%; display: flex; flex-direction: column; gap: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px var(--card-color);
     transform-style: preserve-3d;
+    touch-action: none;
 }
 .risk-card.dragging { z-index: 100; cursor: grabbing; border-color: var(--primary); box-shadow: 0 15px 40px rgba(0, 255, 255, 0.4); }
 .card-tag {
     font-size: 0.75rem; color: #000; background: var(--card-color); padding: 4px 10px;
     border-radius: 6px; align-self: flex-start; font-weight: 800; letter-spacing: 0.5px;
 }
-.card-text { font-size: 1rem; line-height: 1.3; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+.card-text { font-size: 1.12rem; line-height: 1.42; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
-/* 11 Buckets Specific - Flex Wrap Grid! */
-.buckets-area {
-    padding: 10px; background: rgba(0, 0, 0, 0.6);
-    border-top: 1px solid var(--glass-border); padding-bottom: 25px; /* inset safe area */
+/* 11 Buckets Side Rails */
+.buckets-side {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    width: 82px;
+    z-index: 80;
 }
-.buckets-container {
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+
+.buckets-side-left {
+    left: 8px;
 }
+
+.buckets-side-right {
+    right: 8px;
+}
+
+.buckets-column {
+    height: 100%;
+    display: grid;
+    grid-auto-rows: minmax(52px, 1fr);
+    gap: 6px;
+    touch-action: none;
+}
+
 .bucket {
-    width: calc(33.33% - 6px); /* 3 items per row exactly */
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(255, 255, 255, 0.03); border: 2px dashed rgba(255, 255, 255, 0.15);
-    border-radius: 10px; padding: 6px 2px; transition: all 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    background: rgba(10, 16, 28, 0.78); border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 10px; padding: 4px 3px; transition: all 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    min-height: 0;
+    cursor: pointer;
 }
-.bucket .icon { font-size: 1.4rem; pointer-events: none; margin-bottom: 3px; }
-.bucket .name { font-size: 0.65rem; text-align: center; font-weight: 600; pointer-events: none; color: #eee; line-height: 1.1; }
+.bucket .icon { font-size: 1.1rem; pointer-events: none; margin-bottom: 2px; }
+.bucket .name { font-size: 0.56rem; text-align: center; font-weight: 600; pointer-events: none; color: #eee; line-height: 1.12; }
 
 .bucket.drag-over { background: rgba(255, 255, 255, 0.1); transform: scale(1.08); box-shadow: 0 0 15px var(--b-col); border-color: var(--b-col); }
 .bucket.correct { border-color: var(--success); background: rgba(0, 230, 118, 0.3); transform: scale(1.1); }
@@ -185,6 +222,41 @@ body {
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; }
 .modal.hidden { opacity: 0; pointer-events: none; }
 .close-btn { position: absolute; top: -10px; right: 10px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; }
-.qr-wrapper { background: #fff; padding: 20px; border-radius: 10px; margin: 20px auto; display: inline-block; }
+.qr-wrapper { background: #fff; padding: 20px; border-radius: 10px; margin: 20px auto 10px; display: inline-block; }
+.qr-link {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: #cdeaff;
+    word-break: break-all;
+}
+.qr-hint {
+    font-size: 0.75rem;
+    color: #a6b8d2;
+    margin-top: 4px;
+}
 .mt-4 { margin-top: 20px; }
 .mt-2 { margin-top: 10px; }
+
+@media (max-width: 420px) {
+    .buckets-side {
+        width: 72px;
+    }
+
+    .buckets-side-left {
+        left: 4px;
+    }
+
+    .buckets-side-right {
+        right: 4px;
+    }
+
+    .bucket .icon {
+        font-size: 1rem;
+    }
+
+    .bucket .name {
+        font-size: 0.52rem;
+    }
+}

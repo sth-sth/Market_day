@@ -43,14 +43,19 @@
                 <button id="btn-pause" class="icon-btn">⏸️</button>
             </div>
 
-            <div id="drop-zone" class="drop-zone">
-                <div id="feedback-toast" class="feedback-toast hidden"></div>
-                <div id="combo-toast" class="combo-toast hidden"></div>
-            </div>
+            <div class="playfield">
+                <div id="drop-zone" class="drop-zone">
+                    <div id="feedback-toast" class="feedback-toast hidden"></div>
+                    <div id="combo-toast" class="combo-toast hidden"></div>
+                </div>
 
-            <!-- 11 Buckets Dynamic Area -->
-            <div class="buckets-area">
-                <div id="buckets-container" class="buckets-container"></div>
+                <div class="buckets-side buckets-side-left">
+                    <div id="buckets-left" class="buckets-column"></div>
+                </div>
+
+                <div class="buckets-side buckets-side-right">
+                    <div id="buckets-right" class="buckets-column"></div>
+                </div>
             </div>
         </section>
 

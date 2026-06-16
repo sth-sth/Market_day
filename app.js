@@ -11,8 +11,9 @@ const STATE = {
     activeCard: null,
     isPlaying: false,
     timerInterval: null,
+    spawnWatchdog: null,
     deck: [],
-    fallSpeed: 2.2 // Adjusted for extra juiciness
+    fallSpeed: 1.05 // Extra slow descent for more answer time
 };
 
 const els = {
@@ -29,7 +30,8 @@ const els = {
         time: document.getElementById('time'),
         combo: document.getElementById('combo'),
         dropZone: document.getElementById('drop-zone'),
-        buckets: document.getElementById('buckets-container'),
+        bucketsLeft: document.getElementById('buckets-left'),
+        bucketsRight: document.getElementById('buckets-right'),
         feedbackToast: document.getElementById('feedback-toast'),
         comboToast: document.getElementById('combo-toast')
     },
@@ -42,12 +44,12 @@ function init() {
     applyLanguage();
     renderBuckets();
     bindEvents();
-    generateQR();
+    setupQRLink();
 }
 
 function bindEvents() {
     document.getElementById('btn-lang-toggle').addEventListener('click', toggleLang);
-    document.getElementById('btn-start').addEventListener('click', () => showScreen('tutorial'));
+    document.getElementById('btn-start').addEventListener('click', startGame);
     document.getElementById('btn-got-it').addEventListener('click', startGame);
     document.getElementById('btn-pause').addEventListener('click', pauseGame);
     document.getElementById('btn-resume').addEventListener('click', resumeGame);
@@ -84,12 +86,15 @@ function applyLanguage() {
         STATE.activeCard.querySelector('.card-tag').innerText = sourceData[`tag_${currentLang}`];
         STATE.activeCard.querySelector('.card-text').innerText = sourceData[`text_${currentLang}`];
     }
+    refreshQRMeta();
 }
 
 // UI Renderers
 function renderBuckets() {
-    els.ui.buckets.innerHTML = '';
-    buckets.forEach(b => {
+    els.ui.bucketsLeft.innerHTML = '';
+    els.ui.bucketsRight.innerHTML = '';
+
+    buckets.forEach((b, idx) => {
         const div = document.createElement('div');
         div.className = 'bucket';
         div.dataset.id = b.id;
@@ -98,18 +103,32 @@ function renderBuckets() {
             <div class="icon">${b.icon}</div>
             <div class="name">${b[`label_${currentLang}`]}</div>
         `;
-        els.ui.buckets.appendChild(div);
+        // Tap fallback: user can tap a bucket to submit the current card.
+        div.addEventListener('click', () => handleBucketTap(div));
+        const targetCol = idx % 2 === 0 ? els.ui.bucketsLeft : els.ui.bucketsRight;
+        targetCol.appendChild(div);
     });
+}
+
+function handleBucketTap(bucketEl) {
+    if (!STATE.isPlaying || !STATE.activeCard) return;
+    const rect = bucketEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    handleDrop(bucketEl, cx, cy);
 }
 
 function showScreen(name) {
     Object.values(els.screens).forEach(s => s.classList.add('hidden'));
-    if(name === 'tutorial' || name === 'pause') els.screens.game.classList.remove('hidden');
+    if(name === 'pause') els.screens.game.classList.remove('hidden');
     els.screens[name].classList.remove('hidden');
 }
 
 // Game Loop
 function startGame() {
+    clearInterval(STATE.timerInterval);
+    clearInterval(STATE.spawnWatchdog);
+
     STATE.score = 0; STATE.timeRemaining = 60; STATE.combo = 0; STATE.maxCombo = 0;
     STATE.totalCards = 0; STATE.correctDrops = 0; STATE.isPlaying = true;
     STATE.deck = shuffle([...cardsData]);
@@ -129,19 +148,48 @@ function startGame() {
         updateUI();
         if(STATE.timeRemaining <= 0) endGame();
     }, 1000);
+
+    // Safety net: if card flow stalls for any reason, recover automatically.
+    STATE.spawnWatchdog = setInterval(() => {
+        if (!STATE.isPlaying) return;
+        if (STATE.activeCard && !document.body.contains(STATE.activeCard)) {
+            STATE.activeCard = null;
+        }
+        if (!STATE.activeCard) spawnCardFlow();
+    }, 700);
+
     spawnCardFlow();
 }
 
-function pauseGame() { STATE.isPlaying = false; clearInterval(STATE.timerInterval); showScreen('pause'); }
+function pauseGame() {
+    STATE.isPlaying = false;
+    clearInterval(STATE.timerInterval);
+    clearInterval(STATE.spawnWatchdog);
+    showScreen('pause');
+}
 function resumeGame() {
     STATE.isPlaying = true; showScreen('game');
     STATE.timerInterval = setInterval(() => { STATE.timeRemaining--; updateUI(); if(STATE.timeRemaining<=0) endGame(); }, 1000);
-    if (!STATE.activeCard && STATE.deck.length > 0) spawnCardFlow();
+    STATE.spawnWatchdog = setInterval(() => {
+        if (!STATE.isPlaying) return;
+        if (STATE.activeCard && !document.body.contains(STATE.activeCard)) {
+            STATE.activeCard = null;
+        }
+        if (!STATE.activeCard) spawnCardFlow();
+    }, 700);
+    if (!STATE.activeCard) spawnCardFlow();
 }
-function quitGame() { STATE.isPlaying = false; clearInterval(STATE.timerInterval); showScreen('launch'); }
+function quitGame() {
+    STATE.isPlaying = false;
+    clearInterval(STATE.timerInterval);
+    clearInterval(STATE.spawnWatchdog);
+    showScreen('launch');
+}
 
 function endGame() {
-    STATE.isPlaying = false; clearInterval(STATE.timerInterval);
+    STATE.isPlaying = false;
+    clearInterval(STATE.timerInterval);
+    clearInterval(STATE.spawnWatchdog);
     if(STATE.activeCard) { STATE.activeCard.remove(); STATE.activeCard = null; }
     
     const acc = STATE.totalCards > 0 ? Math.round((STATE.correctDrops / STATE.totalCards) * 100) : 0;
@@ -171,6 +219,7 @@ function shuffle(arr) {
 
 function spawnCardFlow() {
     if(!STATE.isPlaying) return;
+    if (STATE.activeCard) return;
     if(STATE.deck.length === 0) STATE.deck = shuffle([...cardsData]);
     const data = STATE.deck.pop();
     spawnCard(data);
@@ -195,7 +244,7 @@ function spawnCard(data) {
     els.ui.dropZone.appendChild(cardEl);
     STATE.activeCard = cardEl;
     
-    let y = -120;
+    let y = -160;
     cardEl.style.top = y + 'px';
     
     let lastTime = performance.now();
@@ -205,7 +254,9 @@ function spawnCard(data) {
         if(!cardEl.classList.contains('dragging')) {
             y += (STATE.fallSpeed * (delta / 16));
             cardEl.style.top = y + 'px';
-            if(y > els.ui.dropZone.clientHeight) { handleDrop(null); return; } // hit floor
+            // Give players a grace buffer after the card reaches the floor line.
+            const missThreshold = els.ui.dropZone.clientHeight + 170;
+            if(y > missThreshold) { handleDrop(null); return; } // hit floor
         }
         requestAnimationFrame(fall);
     }
@@ -222,7 +273,7 @@ function makeDraggable(el) {
         if(!STATE.isPlaying) return;
         isDragging = true;
         el.classList.add('dragging');
-        el.setPointerCapture(e.pointerId);
+        if (typeof e.pointerId === 'number' && el.setPointerCapture) el.setPointerCapture(e.pointerId);
         startX = e.clientX; startY = e.clientY;
         initialTop = parseInt(window.getComputedStyle(el).top, 10);
         initialLeft = parseInt(window.getComputedStyle(el).left, 10) || (els.ui.dropZone.clientWidth / 2);
@@ -249,7 +300,7 @@ function makeDraggable(el) {
         if(!isDragging) return;
         isDragging = false;
         el.classList.remove('dragging');
-        el.releasePointerCapture(e.pointerId);
+        if (typeof e.pointerId === 'number' && el.releasePointerCapture) el.releasePointerCapture(e.pointerId);
         el.style.transform = `translate(-50%, 0)`;
         handleDrop(getTargetBucket(e.clientX, e.clientY), e.clientX, e.clientY);
     }
@@ -258,6 +309,26 @@ function makeDraggable(el) {
     el.addEventListener('pointermove', onPointerMove);
     el.addEventListener('pointerup', onPointerUp);
     el.addEventListener('pointercancel', onPointerUp);
+
+    // Touch fallback for environments with inconsistent pointer events.
+    el.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        const t = e.touches[0];
+        onPointerDown({ clientX: t.clientX, clientY: t.clientY });
+    }, { passive: true });
+
+    el.addEventListener('touchmove', (e) => {
+        if (!isDragging || !e.touches || !e.touches[0]) return;
+        e.preventDefault();
+        const t = e.touches[0];
+        onPointerMove({ clientX: t.clientX, clientY: t.clientY });
+    }, { passive: false });
+
+    el.addEventListener('touchend', (e) => {
+        const t = (e.changedTouches && e.changedTouches[0]) || null;
+        if (!t) return;
+        onPointerUp({ clientX: t.clientX, clientY: t.clientY });
+    }, { passive: true });
 }
 
 function checkHover(x, y) {
@@ -345,10 +416,72 @@ function checkComboMilestone() {
 }
 
 // QR
-function generateQR() {
-    new QRCode(els.qrWrapper, { text: window.location.href, width: 140, height: 140, colorDark: "#00ffff", colorLight: "#111" });
+function getShareUrl() {
+    return window.location.href;
 }
-function showQR() { els.qrModal.classList.remove('hidden'); }
+
+function setupQRLink() {
+    const parent = els.qrWrapper.parentElement;
+    if (!parent || document.getElementById('qr-link')) return;
+
+    const link = document.createElement('a');
+    link.id = 'qr-link';
+    link.className = 'qr-link';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+
+    const hint = document.createElement('p');
+    hint.id = 'qr-hint';
+    hint.className = 'qr-hint';
+
+    parent.appendChild(link);
+    parent.appendChild(hint);
+    refreshQRMeta();
+}
+
+function refreshQRMeta() {
+    const url = getShareUrl();
+    const link = document.getElementById('qr-link');
+    const hint = document.getElementById('qr-hint');
+    if (link) {
+        link.href = url;
+        link.innerText = url;
+    }
+    if (hint) {
+        const isLocal = /^(localhost|127\\.0\\.0\\.1)$/i.test(window.location.hostname);
+        hint.innerText = isLocal
+            ? (currentLang === 'zh' ? '目前是本機位址，手機無法直接連入。請改用可外網存取網址再分享。' : 'This is a local URL and is not reachable by phone. Use a public URL before sharing.')
+            : (currentLang === 'zh' ? '若無法掃碼，點擊上方連結可直接開啟。' : 'If QR scan fails, open the link above directly.');
+    }
+}
+
+function generateQR() {
+    if (!els.qrWrapper) return;
+    refreshQRMeta();
+    els.qrWrapper.innerHTML = '';
+
+    if (typeof QRCode !== 'function') {
+        const fallback = document.createElement('p');
+        fallback.className = 'qr-hint';
+        fallback.innerText = currentLang === 'zh' ? '未載入 QR 函式庫，請直接使用下方連結。' : 'QR library unavailable, please use the link below.';
+        els.qrWrapper.appendChild(fallback);
+        return;
+    }
+
+    new QRCode(els.qrWrapper, {
+        text: getShareUrl(),
+        width: 180,
+        height: 180,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+}
+
+function showQR() {
+    generateQR();
+    els.qrModal.classList.remove('hidden');
+}
 function hideQR() { els.qrModal.classList.add('hidden'); }
 
 window.addEventListener('DOMContentLoaded', init);
