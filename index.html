@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SCoC Drop Match</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .hidden { display: none !important; }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
@@ -39,12 +42,18 @@
                     <div class="stat-box"><span data-i18n="score">分數</span><strong id="score">0</strong></div>
                     <div class="stat-box"><span data-i18n="time">時間</span><strong id="time">60</strong></div>
                     <div class="stat-box"><span data-i18n="combo">連擊</span><strong id="combo" class="text-glow">0</strong></div>
+                    <div class="stat-box"><span data-i18n="lives">生命</span><strong id="lives">3</strong></div>
                 </div>
                 <button id="btn-pause" class="icon-btn">⏸️</button>
             </div>
 
+            <div class="time-rail">
+                <div id="time-fill" class="time-fill"></div>
+            </div>
+
             <div class="playfield">
                 <div id="drop-zone" class="drop-zone">
+                    <div id="countdown-overlay" class="countdown-overlay hidden">3</div>
                     <div id="feedback-toast" class="feedback-toast hidden"></div>
                     <div id="combo-toast" class="combo-toast hidden"></div>
                 </div>
@@ -73,6 +82,7 @@
             <div class="glass-panel">
                 <h2 data-i18n="settleTitle" class="neon-text">挑戰完成</h2>
                 <h1 id="final-title" class="rank-title rainbow-text">Participant</h1>
+                <p id="final-reason" class="subtitle"></p>
                 <div class="final-grid">
                     <div class="f-stat"><span data-i18n="score">分數</span><strong id="final-score">0</strong></div>
                     <div class="f-stat"><span data-i18n="acc">準確率</span><strong id="final-accuracy">0%</strong></div>

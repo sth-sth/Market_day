@@ -4,6 +4,7 @@ let currentLang = 'zh'; // Default Chinese as requested
 const STATE = {
     timeRemaining: 60,
     score: 0,
+    lives: 3,
     totalCards: 0,
     correctDrops: 0,
     combo: 0,
@@ -29,6 +30,9 @@ const els = {
         score: document.getElementById('score'),
         time: document.getElementById('time'),
         combo: document.getElementById('combo'),
+        lives: document.getElementById('lives'),
+        timeFill: document.getElementById('time-fill'),
+        countdown: document.getElementById('countdown-overlay'),
         dropZone: document.getElementById('drop-zone'),
         bucketsLeft: document.getElementById('buckets-left'),
         bucketsRight: document.getElementById('buckets-right'),
@@ -49,7 +53,7 @@ function init() {
 
 function bindEvents() {
     document.getElementById('btn-lang-toggle').addEventListener('click', toggleLang);
-    document.getElementById('btn-start').addEventListener('click', startGame);
+    document.getElementById('btn-start').addEventListener('click', openTutorial);
     document.getElementById('btn-got-it').addEventListener('click', startGame);
     document.getElementById('btn-pause').addEventListener('click', pauseGame);
     document.getElementById('btn-resume').addEventListener('click', resumeGame);
@@ -64,6 +68,10 @@ function bindEvents() {
     document.body.addEventListener('touchmove', (e) => {
         if(STATE.isPlaying) e.preventDefault();
     }, { passive: false });
+}
+
+function openTutorial() {
+    showScreen('tutorial');
 }
 
 // Language Logic
@@ -125,28 +133,33 @@ function showScreen(name) {
 }
 
 // Game Loop
-function startGame() {
+async function startGame() {
     clearInterval(STATE.timerInterval);
     clearInterval(STATE.spawnWatchdog);
 
-    STATE.score = 0; STATE.timeRemaining = 60; STATE.combo = 0; STATE.maxCombo = 0;
+    STATE.score = 0; STATE.timeRemaining = 60; STATE.combo = 0; STATE.maxCombo = 0; STATE.lives = 3;
     STATE.totalCards = 0; STATE.correctDrops = 0; STATE.isPlaying = true;
     STATE.deck = shuffle([...cardsData]);
     
     updateUI();
     els.ui.dropZone.innerHTML = `
+        <div id="countdown-overlay" class="countdown-overlay hidden">3</div>
         <div id="feedback-toast" class="feedback-toast hidden"></div>
         <div id="combo-toast" class="combo-toast hidden"></div>
     `;
+    els.ui.countdown = document.getElementById('countdown-overlay');
     els.ui.feedbackToast = document.getElementById('feedback-toast');
     els.ui.comboToast = document.getElementById('combo-toast');
     
     showScreen('game');
+    await playCountdown();
+
+    if (!STATE.isPlaying) return;
     
     STATE.timerInterval = setInterval(() => {
         STATE.timeRemaining--;
         updateUI();
-        if(STATE.timeRemaining <= 0) endGame();
+        if(STATE.timeRemaining <= 0) endGame('time');
     }, 1000);
 
     // Safety net: if card flow stalls for any reason, recover automatically.
@@ -159,6 +172,42 @@ function startGame() {
     }, 700);
 
     spawnCardFlow();
+}
+
+function playCountdown() {
+    return new Promise((resolve) => {
+        const c = els.ui.countdown;
+        if (!c) {
+            resolve();
+            return;
+        }
+        const marks = ['3', '2', '1', currentLang === 'zh' ? '開始!' : 'GO!'];
+        c.classList.remove('hidden');
+        let idx = 0;
+
+        function tick() {
+            if (!STATE.isPlaying) {
+                c.classList.add('hidden');
+                resolve();
+                return;
+            }
+            c.innerText = marks[idx];
+            c.classList.remove('pulse');
+            c.offsetHeight;
+            c.classList.add('pulse');
+            idx++;
+            if (idx < marks.length) {
+                setTimeout(tick, 450);
+            } else {
+                setTimeout(() => {
+                    c.classList.add('hidden');
+                    resolve();
+                }, 320);
+            }
+        }
+
+        tick();
+    });
 }
 
 function pauseGame() {
@@ -195,6 +244,12 @@ function endGame() {
     const acc = STATE.totalCards > 0 ? Math.round((STATE.correctDrops / STATE.totalCards) * 100) : 0;
     document.getElementById('final-score').innerText = STATE.score;
     document.getElementById('final-accuracy').innerText = acc + '%';
+    const reasonEl = document.getElementById('final-reason');
+    if (reasonEl) {
+        reasonEl.innerText = STATE.lives <= 0
+            ? (currentLang === 'zh' ? '生命耗盡，任務結束。' : 'Out of lives. Mission failed.')
+            : (currentLang === 'zh' ? '時間到，任務結束。' : 'Time up. Mission complete.');
+    }
     
     let rank = currentLang === 'zh' ? "SCoC 專家" : "SCoC Expert";
     if (acc >= 90) rank = currentLang === 'zh' ? "合規大使" : "Ethics Guardian";
@@ -208,6 +263,11 @@ function updateUI() {
     els.ui.score.innerText = STATE.score;
     els.ui.time.innerText = STATE.timeRemaining;
     els.ui.combo.innerText = STATE.combo;
+    els.ui.lives.innerText = '❤'.repeat(Math.max(0, STATE.lives));
+    if (els.ui.timeFill) {
+        const pct = Math.max(0, Math.min(100, (STATE.timeRemaining / 60) * 100));
+        els.ui.timeFill.style.width = pct + '%';
+    }
 }
 
 // Mechanics
@@ -368,13 +428,22 @@ function handleDrop(bucketEl, dropX, dropY) {
     } else {
         // WRONG OR MISSED
         STATE.combo = 0;
+        applyLifePenalty();
         els.app.classList.add('shake'); setTimeout(()=>els.app.classList.remove('shake'), 400);
-        showFeedback(bucketEl ? '✗ ' + sData[`feedback_${currentLang}`] : 'Miss: ' + sData[`feedback_${currentLang}`], false);
+        showFeedback(bucketEl ? '✗ ' + sData[`feedback_${currentLang}`] : (currentLang === 'zh' ? '漏接：' : 'Miss: ') + sData[`feedback_${currentLang}`], false);
     }
     
     card.style.transition = 'all 0.3s ease'; card.style.opacity = '0';
     card.style.transform = `translate(-50%, 50px) scale(0.2)`;
     setTimeout(() => { card.remove(); updateUI(); setTimeout(spawnCardFlow, 100); }, 300);
+}
+
+function applyLifePenalty() {
+    STATE.lives = Math.max(0, STATE.lives - 1);
+    updateUI();
+    if (STATE.lives <= 0) {
+        endGame('lives');
+    }
 }
 
 function createParticles(x, y, color) {
