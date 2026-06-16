@@ -59,3 +59,4 @@ vercel --prod
 
 - `server.js` is for local development only.
 - Vercel serves the static files (`index.html`, `app.js`, `data.js`, `styles.css`) directly.
+- If you previously deployed with a Node/server preset, redeploy after this config update so Vercel uses static output instead of a serverless function.
