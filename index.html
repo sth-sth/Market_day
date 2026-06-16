@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SCoC Drop Match</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <button id="btn-lang-toggle" class="lang-btn" data-i18n="langBtn">EN</button>
+    
+    <div id="app" class="app-container">
+        <!-- Launch Screen -->
+        <section id="launch-screen" class="screen flex-center active">
+            <h1 data-i18n="title">SCoC 墜落配對</h1>
+            <p class="subtitle" data-i18n="subtitle">捕捉風險，精準配對。</p>
+            <p data-i18n="launchDesc" style="margin-bottom:30px; font-weight:bold;">掌握 CLP 供應商行為準則的 11 大主題！</p>
+            <button id="btn-start" class="btn btn-neon" data-i18n="start">開始任務</button>
+            <button id="btn-show-qr-launch" class="btn btn-outline" data-i18n="shareBtn">分享遊戲</button>
+        </section>
+
+        <!-- Tutorial Overlay -->
+        <section id="tutorial-overlay" class="screen flex-center overlay hidden">
+            <div class="glass-panel">
+                <h2 data-i18n="howTo" class="neon-text">任務簡報</h2>
+                <div class="tut-icon">🎯</div>
+                <p data-i18n="tutDesc1">將掉落的危險事件卡快速拖拽到對應的準則類別中。</p>
+                <p data-i18n="tutDesc2" style="margin-top:10px; color:var(--primary);">11個主題，60秒挑戰。連續答對獲取超高分！</p>
+                <button id="btn-got-it" class="btn btn-neon mt-4" data-i18n="gotIt">出發！</button>
+            </div>
+        </section>
+
+        <!-- Main Game -->
+        <section id="game-ui" class="screen hidden">
+            <div class="header">
+                <div>CLP SCoC</div>
+                <div class="stats">
+                    <div class="stat-box"><span data-i18n="score">分數</span><strong id="score">0</strong></div>
+                    <div class="stat-box"><span data-i18n="time">時間</span><strong id="time">60</strong></div>
+                    <div class="stat-box"><span data-i18n="combo">連擊</span><strong id="combo" class="text-glow">0</strong></div>
+                </div>
+                <button id="btn-pause" class="icon-btn">⏸️</button>
+            </div>
+
+            <div id="drop-zone" class="drop-zone">
+                <div id="feedback-toast" class="feedback-toast hidden"></div>
+                <div id="combo-toast" class="combo-toast hidden"></div>
+            </div>
+
+            <!-- 11 Buckets Dynamic Area -->
+            <div class="buckets-area">
+                <div id="buckets-container" class="buckets-container"></div>
+            </div>
+        </section>
+
+        <!-- Pause Menu -->
+        <section id="pause-overlay" class="screen flex-center overlay hidden">
+            <div class="glass-panel">
+                <h2 data-i18n="paused">任務暫停</h2>
+                <button id="btn-resume" class="btn btn-neon mt-4" data-i18n="resume">繼續</button>
+                <button id="btn-quit" class="btn btn-outline mt-2" data-i18n="quit">返回主選單</button>
+            </div>
+        </section>
+
+        <!-- Settlement -->
+        <section id="settlement-screen" class="screen flex-center hidden overlay">
+            <div class="glass-panel">
+                <h2 data-i18n="settleTitle" class="neon-text">挑戰完成</h2>
+                <h1 id="final-title" class="rank-title rainbow-text">Participant</h1>
+                <div class="final-grid">
+                    <div class="f-stat"><span data-i18n="score">分數</span><strong id="final-score">0</strong></div>
+                    <div class="f-stat"><span data-i18n="acc">準確率</span><strong id="final-accuracy">0%</strong></div>
+                </div>
+                <button id="btn-play-again" class="btn btn-neon mt-4" data-i18n="playAgain">再玩一次</button>
+                <button id="btn-show-qr-settlement" class="btn btn-outline mt-2" data-i18n="shareBtn">分享遊戲</button>
+            </div>
+        </section>
+
+        <!-- QR Modal -->
+        <div id="qr-modal" class="modal hidden">
+            <div class="glass-panel" style="position:relative;">
+                <button id="btn-close-qr" class="close-btn">&times;</button>
+                <h3 data-i18n="qrTitle" class="neon-text">掃碼挑戰</h3>
+                <div id="qrcode" class="qr-wrapper"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

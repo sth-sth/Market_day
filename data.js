@@ -1,0 +1,86 @@
+const i18n = {
+    en: {
+        title: "SCoC Drop Match",
+        subtitle: "Catch the Risk. Match the Right Code.",
+        launchDesc: "Master the 11 key topics of CLP's Supplier Code of Conduct!",
+        start: "Start Mission",
+        shareBtn: "Share via QR",
+        howTo: "Mission Briefing",
+        tutDesc1: "Drag falling events into the correct SCoC bucket below.",
+        tutDesc2: "11 Categories. 60 Seconds. Build combos for massive points!",
+        gotIt: "Let's Go!",
+        score: "SCORE",
+        time: "TIME",
+        acc: "ACCURACY",
+        combo: "COMBO",
+        paused: "Mission Paused",
+        resume: "Resume",
+        quit: "Quit to Menu",
+        settleTitle: "Challenge Complete",
+        playAgain: "Play Again",
+        qrTitle: "Scan & Play",
+        langBtn: "繁體"
+    },
+    zh: {
+        title: "SCoC 墜落配對",
+        subtitle: "捕捉風險，精準配對。",
+        launchDesc: "掌握 CLP 供應商行為準則的 11 大主題！",
+        start: "開始任務",
+        shareBtn: "分享遊戲",
+        howTo: "任務簡報",
+        tutDesc1: "將掉落的危險事件卡快速拖拽到對應的準則類別中。",
+        tutDesc2: "11個主題，60秒挑戰。連續答對獲取超高分！",
+        gotIt: "出發！",
+        score: "分數",
+        time: "時間",
+        acc: "準確率",
+        combo: "連擊",
+        paused: "任務暫停",
+        resume: "繼續",
+        quit: "返回主選單",
+        settleTitle: "挑戰完成",
+        playAgain: "再玩一次",
+        qrTitle: "掃碼挑戰",
+        langBtn: "EN"
+    }
+};
+
+// All 11 topics carefully mapped from the standard SCoC PDF
+const buckets = [
+    { id: 'leg', label_en: 'Legal', label_zh: '法律合規', icon: '⚖️', color: '#ff4d4d' },
+    { id: 'eth', label_en: 'Ethics', label_zh: '商業道德', icon: '🤝', color: '#ff9f43' },
+    { id: 'cyb', label_en: 'Cyber', label_zh: '網絡安全', icon: '💻', color: '#0abde3' },
+    { id: 'qas', label_en: 'Quality', label_zh: '質量與安全', icon: '🛡️', color: '#10ac84' },
+    { id: 'env', label_en: 'Environment', label_zh: '環境管理', icon: '🌿', color: '#1dd1a1' },
+    { id: 'cli', label_en: 'Climate', label_zh: '氣候變化', icon: '🌡️', color: '#feca57' },
+    { id: 'ehs', label_en: 'Health', label_zh: '健康與安全', icon: '👷', color: '#ff6b6b' },
+    { id: 'lab', label_en: 'Labour', label_zh: '勞工與人權', icon: '👥', color: '#ee5253' },
+    { id: 'div', label_en: 'Diversity', label_zh: '多元與包容', icon: '🌈', color: '#f368e0' },
+    { id: 'com', label_en: 'Community', label_zh: '社區關係', icon: '🏘️', color: '#82ccdd' },
+    { id: 'sup', label_en: 'Supply Chain', label_zh: '供應鏈管理', icon: '🔗', color: '#9b59b6' }
+];
+
+const cardsData = [
+    { bucket: 'leg', tag_en: 'Notice', tag_zh: '通知', text_en: 'Sanctions risk hidden', text_zh: '隱瞞國際制裁風險', feedback_en: 'Sanctions = Legal', feedback_zh: '制裁風險屬於法律合規' },
+    { bucket: 'leg', tag_en: 'Audit', tag_zh: '審計', text_en: 'Anti-competition pact', text_zh: '簽署反競爭協議', feedback_en: 'Fair play is Legal', feedback_zh: '公平競爭是法律義務' },
+    { bucket: 'eth', tag_en: 'Email', tag_zh: '機密', text_en: 'Secret gift to manager', text_zh: '私下向採購送豪華禮物', feedback_en: 'Gifts = Ethics', feedback_zh: '送禮涉及商業道德' },
+    { bucket: 'eth', tag_en: 'Alert', tag_zh: '警告', text_en: 'Undisclosed conflict of interest', text_zh: '未披露強烈利益衝突', feedback_en: 'CoI = Ethics', feedback_zh: '利益衝突需第一時間申報' },
+    { bucket: 'cyb', tag_en: 'Incident', tag_zh: '事件', text_en: 'Customer data leaked online', text_zh: '洩漏大量客戶隱私數據', feedback_en: 'Data leak = Cyber', feedback_zh: '數據洩漏是網絡安全紅線' },
+    { bucket: 'cyb', tag_en: 'Alert', tag_zh: '警告', text_en: 'Supplier account hacked', text_zh: '供應商內部系統被黑客入侵', feedback_en: 'Hack = Cyber', feedback_zh: '賬號被黑危及網絡安全' },
+    { bucket: 'qas', tag_en: 'Defect', tag_zh: '缺陷', text_en: 'Product fails safety test', text_zh: '交付產品未通過安全測試', feedback_en: 'Testing = Quality', feedback_zh: '測試與質量安全息息相關' },
+    { bucket: 'qas', tag_en: 'Report', tag_zh: '報告', text_en: 'Counterfeit materials used', text_zh: '違規使用假冒替代材料', feedback_en: 'Counterfeit = Quality', feedback_zh: '假冒材料嚴重影響質量' },
+    { bucket: 'env', tag_en: 'Site', tag_zh: '現場', text_en: 'Chemical spill in river', text_zh: '有毒化學品直接洩漏至河流', feedback_en: 'Spill = Environment', feedback_zh: '化學洩漏屬環境管理範疇' },
+    { bucket: 'env', tag_en: 'Audit', tag_zh: '審計', text_en: 'Illegal waste dumping', text_zh: '夜間非法傾倒工業廢物', feedback_en: 'Waste = Environment', feedback_zh: '違法排污必須嚴打' },
+    { bucket: 'cli', tag_en: 'ESG', tag_zh: '指標', text_en: 'No carbon reduction goal', text_zh: '未設立任何減碳或排零目標', feedback_en: 'Carbon = Climate Change', feedback_zh: '減碳目標攸關氣候變化' },
+    { bucket: 'cli', tag_en: 'Report', tag_zh: '報告', text_en: 'Refuse emission reporting', text_zh: '拒絕透明匯報溫室氣體排放', feedback_en: 'Emissions = Climate', feedback_zh: '碳牌放報告屬氣候變化準則' },
+    { bucket: 'ehs', tag_en: 'Site', tag_zh: '現場', text_en: 'Lack of safety harness', text_zh: '高空作業人員未配備安全帶', feedback_en: 'Worker Safety = EHS', feedback_zh: '高空墜落風險屬健康安全' },
+    { bucket: 'ehs', tag_en: 'Alert', tag_zh: '警告', text_en: 'Toxic fume exposure', text_zh: '車間工人長時間暴露於毒氣', feedback_en: 'Hazards = EHS', feedback_zh: '職業病危害屬健康與安全' },
+    { bucket: 'lab', tag_en: 'Audit', tag_zh: '突擊', text_en: '15-year-old on night shift', text_zh: '驚現15歲童工違規值夜班', feedback_en: 'Child Labour = Rights', feedback_zh: '禁止童工是勞工人權底線' },
+    { bucket: 'lab', tag_en: 'Alert', tag_zh: '警告', text_en: 'Passports confiscated', text_zh: '管理層強行扣押外勞護照', feedback_en: 'Forced Labour = Rights', feedback_zh: '強迫勞動絕對不可接受' },
+    { bucket: 'div', tag_en: 'HR', tag_zh: '人力', text_en: 'Refusing to hire minorities', text_zh: '公開拒絕面試少數族裔', feedback_en: 'Discrimination = Diversity', feedback_zh: '系統性歧視違反包容性原則' },
+    { bucket: 'div', tag_en: 'Report', tag_zh: '報告', text_en: 'Gender pay gap ignored', text_zh: '管理層無視嚴重性別薪酬差異', feedback_en: 'Pay gap = Diversity', feedback_zh: '同工同酬屬多元化管理' },
+    { bucket: 'com', tag_en: 'News', tag_zh: '投訴', text_en: 'Noise disrupts local school', text_zh: '全天施工噪音嚴重干擾學校', feedback_en: 'Local impact = Community', feedback_zh: '鄰避效應需妥善處理社區關係' },
+    { bucket: 'com', tag_en: 'Alert', tag_zh: '警告', text_en: 'Ignoring village complaints', text_zh: '粗暴無視周邊村民訴求', feedback_en: 'Grievance = Community', feedback_zh: '無視訴求會破壞社區關係' },
+    { bucket: 'sup', tag_en: 'Audit', tag_zh: '審查', text_en: 'No sub-contractor checks', text_zh: '從不審查下層分包商風險', feedback_en: 'Sub-tier = Supply Chain', feedback_zh: '層層落實屬供應鏈管理' },
+    { bucket: 'sup', tag_en: 'Notice', tag_zh: '通知', text_en: 'Buying from sanctioned mine', text_zh: '向受制裁高風險礦場採購', feedback_en: 'Sourcing = Supply Chain', feedback_zh: '負責任採購是供應鏈義務' }
+];

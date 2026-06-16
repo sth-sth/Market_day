@@ -1,0 +1,354 @@
+// Global State and Core Logic
+let currentLang = 'zh'; // Default Chinese as requested
+
+const STATE = {
+    timeRemaining: 60,
+    score: 0,
+    totalCards: 0,
+    correctDrops: 0,
+    combo: 0,
+    maxCombo: 0,
+    activeCard: null,
+    isPlaying: false,
+    timerInterval: null,
+    deck: [],
+    fallSpeed: 2.2 // Adjusted for extra juiciness
+};
+
+const els = {
+    app: document.getElementById('app'),
+    screens: {
+        launch: document.getElementById('launch-screen'),
+        tutorial: document.getElementById('tutorial-overlay'),
+        game: document.getElementById('game-ui'),
+        pause: document.getElementById('pause-overlay'),
+        settlement: document.getElementById('settlement-screen')
+    },
+    ui: {
+        score: document.getElementById('score'),
+        time: document.getElementById('time'),
+        combo: document.getElementById('combo'),
+        dropZone: document.getElementById('drop-zone'),
+        buckets: document.getElementById('buckets-container'),
+        feedbackToast: document.getElementById('feedback-toast'),
+        comboToast: document.getElementById('combo-toast')
+    },
+    qrModal: document.getElementById('qr-modal'),
+    qrWrapper: document.getElementById('qrcode')
+};
+
+// Initial Setup
+function init() {
+    applyLanguage();
+    renderBuckets();
+    bindEvents();
+    generateQR();
+}
+
+function bindEvents() {
+    document.getElementById('btn-lang-toggle').addEventListener('click', toggleLang);
+    document.getElementById('btn-start').addEventListener('click', () => showScreen('tutorial'));
+    document.getElementById('btn-got-it').addEventListener('click', startGame);
+    document.getElementById('btn-pause').addEventListener('click', pauseGame);
+    document.getElementById('btn-resume').addEventListener('click', resumeGame);
+    document.getElementById('btn-quit').addEventListener('click', quitGame);
+    document.getElementById('btn-play-again').addEventListener('click', startGame);
+    
+    document.getElementById('btn-show-qr-launch').addEventListener('click', showQR);
+    document.getElementById('btn-show-qr-settlement').addEventListener('click', showQR);
+    document.getElementById('btn-close-qr').addEventListener('click', hideQR);
+    
+    // Prevent default scroll bounce on mobile
+    document.body.addEventListener('touchmove', (e) => {
+        if(STATE.isPlaying) e.preventDefault();
+    }, { passive: false });
+}
+
+// Language Logic
+function toggleLang() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    applyLanguage();
+}
+
+function applyLanguage() {
+    const dict = i18n[currentLang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+    });
+    // Re-render UI components dependent on text
+    renderBuckets();
+    if(STATE.activeCard) {
+        // Soft refresh active card texts safely
+        const sourceData = JSON.parse(STATE.activeCard.dataset.source);
+        STATE.activeCard.querySelector('.card-tag').innerText = sourceData[`tag_${currentLang}`];
+        STATE.activeCard.querySelector('.card-text').innerText = sourceData[`text_${currentLang}`];
+    }
+}
+
+// UI Renderers
+function renderBuckets() {
+    els.ui.buckets.innerHTML = '';
+    buckets.forEach(b => {
+        const div = document.createElement('div');
+        div.className = 'bucket';
+        div.dataset.id = b.id;
+        div.style.setProperty('--b-col', b.color);
+        div.innerHTML = `
+            <div class="icon">${b.icon}</div>
+            <div class="name">${b[`label_${currentLang}`]}</div>
+        `;
+        els.ui.buckets.appendChild(div);
+    });
+}
+
+function showScreen(name) {
+    Object.values(els.screens).forEach(s => s.classList.add('hidden'));
+    if(name === 'tutorial' || name === 'pause') els.screens.game.classList.remove('hidden');
+    els.screens[name].classList.remove('hidden');
+}
+
+// Game Loop
+function startGame() {
+    STATE.score = 0; STATE.timeRemaining = 60; STATE.combo = 0; STATE.maxCombo = 0;
+    STATE.totalCards = 0; STATE.correctDrops = 0; STATE.isPlaying = true;
+    STATE.deck = shuffle([...cardsData]);
+    
+    updateUI();
+    els.ui.dropZone.innerHTML = `
+        <div id="feedback-toast" class="feedback-toast hidden"></div>
+        <div id="combo-toast" class="combo-toast hidden"></div>
+    `;
+    els.ui.feedbackToast = document.getElementById('feedback-toast');
+    els.ui.comboToast = document.getElementById('combo-toast');
+    
+    showScreen('game');
+    
+    STATE.timerInterval = setInterval(() => {
+        STATE.timeRemaining--;
+        updateUI();
+        if(STATE.timeRemaining <= 0) endGame();
+    }, 1000);
+    spawnCardFlow();
+}
+
+function pauseGame() { STATE.isPlaying = false; clearInterval(STATE.timerInterval); showScreen('pause'); }
+function resumeGame() {
+    STATE.isPlaying = true; showScreen('game');
+    STATE.timerInterval = setInterval(() => { STATE.timeRemaining--; updateUI(); if(STATE.timeRemaining<=0) endGame(); }, 1000);
+    if (!STATE.activeCard && STATE.deck.length > 0) spawnCardFlow();
+}
+function quitGame() { STATE.isPlaying = false; clearInterval(STATE.timerInterval); showScreen('launch'); }
+
+function endGame() {
+    STATE.isPlaying = false; clearInterval(STATE.timerInterval);
+    if(STATE.activeCard) { STATE.activeCard.remove(); STATE.activeCard = null; }
+    
+    const acc = STATE.totalCards > 0 ? Math.round((STATE.correctDrops / STATE.totalCards) * 100) : 0;
+    document.getElementById('final-score').innerText = STATE.score;
+    document.getElementById('final-accuracy').innerText = acc + '%';
+    
+    let rank = currentLang === 'zh' ? "SCoC 專家" : "SCoC Expert";
+    if (acc >= 90) rank = currentLang === 'zh' ? "合規大使" : "Ethics Guardian";
+    else if (acc < 50) rank = currentLang === 'zh' ? "風險學員" : "Risk Trainee";
+    document.getElementById('final-title').innerText = rank;
+    
+    showScreen('settlement');
+}
+
+function updateUI() {
+    els.ui.score.innerText = STATE.score;
+    els.ui.time.innerText = STATE.timeRemaining;
+    els.ui.combo.innerText = STATE.combo;
+}
+
+// Mechanics
+function shuffle(arr) {
+    let array = [...arr];
+    for(let i = array.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [array[i], array[j]] = [array[j], array[i]]; }
+    return array;
+}
+
+function spawnCardFlow() {
+    if(!STATE.isPlaying) return;
+    if(STATE.deck.length === 0) STATE.deck = shuffle([...cardsData]);
+    const data = STATE.deck.pop();
+    spawnCard(data);
+}
+
+function spawnCard(data) {
+    STATE.totalCards++;
+    const cardEl = document.createElement('div');
+    cardEl.className = 'risk-card';
+    cardEl.dataset.bucket = data.bucket;
+    cardEl.dataset.source = JSON.stringify(data); // for realtime translation update
+    
+    // Matched color for border glow
+    const bucketMeta = buckets.find(b => b.id === data.bucket);
+    cardEl.style.setProperty('--card-color', bucketMeta ? bucketMeta.color : '#00ffff');
+    
+    cardEl.innerHTML = `
+        <div class="card-tag" style="background:${bucketMeta.color}; color:#fff;">${data[`tag_${currentLang}`]}</div>
+        <div class="card-text">${data[`text_${currentLang}`]}</div>
+    `;
+    
+    els.ui.dropZone.appendChild(cardEl);
+    STATE.activeCard = cardEl;
+    
+    let y = -120;
+    cardEl.style.top = y + 'px';
+    
+    let lastTime = performance.now();
+    function fall(time) {
+        if(!STATE.isPlaying || cardEl !== STATE.activeCard) return;
+        let delta = time - lastTime; lastTime = time;
+        if(!cardEl.classList.contains('dragging')) {
+            y += (STATE.fallSpeed * (delta / 16));
+            cardEl.style.top = y + 'px';
+            if(y > els.ui.dropZone.clientHeight) { handleDrop(null); return; } // hit floor
+        }
+        requestAnimationFrame(fall);
+    }
+    requestAnimationFrame(fall);
+    makeDraggable(cardEl);
+}
+
+// 3D Tilt Drag & Drop Physics
+function makeDraggable(el) {
+    let isDragging = false;
+    let startY = 0, startX = 0, initialTop = 0, initialLeft = 0;
+
+    function onPointerDown(e) {
+        if(!STATE.isPlaying) return;
+        isDragging = true;
+        el.classList.add('dragging');
+        el.setPointerCapture(e.pointerId);
+        startX = e.clientX; startY = e.clientY;
+        initialTop = parseInt(window.getComputedStyle(el).top, 10);
+        initialLeft = parseInt(window.getComputedStyle(el).left, 10) || (els.ui.dropZone.clientWidth / 2);
+        el.style.left = initialLeft + 'px';
+        el.style.margin = '0';
+        el.style.transform = `translate(-50%, -50%) scale(1.05)`;
+    }
+
+    function onPointerMove(e) {
+        if(!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        el.style.left = (initialLeft + dx) + 'px';
+        el.style.top = (initialTop + dy) + 'px';
+        
+        // 3D Tilt effect based on drag direction speed
+        let rotateTilt = Math.max(-15, Math.min(15, dx * 0.15));
+        el.style.transform = `translate(-50%, -50%) rotateZ(${rotateTilt}deg) rotateY(${rotateTilt}deg) scale(1.05)`;
+        
+        checkHover(e.clientX, e.clientY);
+    }
+
+    function onPointerUp(e) {
+        if(!isDragging) return;
+        isDragging = false;
+        el.classList.remove('dragging');
+        el.releasePointerCapture(e.pointerId);
+        el.style.transform = `translate(-50%, 0)`;
+        handleDrop(getTargetBucket(e.clientX, e.clientY), e.clientX, e.clientY);
+    }
+
+    el.addEventListener('pointerdown', onPointerDown);
+    el.addEventListener('pointermove', onPointerMove);
+    el.addEventListener('pointerup', onPointerUp);
+    el.addEventListener('pointercancel', onPointerUp);
+}
+
+function checkHover(x, y) {
+    document.querySelectorAll('.bucket').forEach(b => b.classList.remove('drag-over'));
+    const t = getTargetBucket(x, y);
+    if(t) t.classList.add('drag-over');
+}
+
+function getTargetBucket(x, y) {
+    const bucketsNode = document.querySelectorAll('.bucket');
+    for(let b of bucketsNode) {
+        const r = b.getBoundingClientRect();
+        if(x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return b;
+    }
+    return null;
+}
+
+// Resolution & Particles
+function handleDrop(bucketEl, dropX, dropY) {
+    if(!STATE.activeCard) return;
+    const card = STATE.activeCard;
+    const sData = JSON.parse(card.dataset.source);
+    document.querySelectorAll('.bucket').forEach(b => b.classList.remove('drag-over'));
+    
+    STATE.activeCard = null;
+    let bColor = buckets.find(b=>b.id === sData.bucket)?.color || '#fff';
+
+    if(bucketEl && bucketEl.dataset.id === sData.bucket) {
+        // CORRECT
+        STATE.score += 100 + (STATE.combo * 20); STATE.correctDrops++; STATE.combo++;
+        if(STATE.combo > STATE.maxCombo) STATE.maxCombo = STATE.combo;
+        
+        bucketEl.classList.add('correct'); setTimeout(()=>bucketEl.classList.remove('correct'), 300);
+        showFeedback('✓ ' + sData[`feedback_${currentLang}`], true);
+        checkComboMilestone();
+        createParticles(dropX, dropY, bColor);
+    } else {
+        // WRONG OR MISSED
+        STATE.combo = 0;
+        els.app.classList.add('shake'); setTimeout(()=>els.app.classList.remove('shake'), 400);
+        showFeedback(bucketEl ? '✗ ' + sData[`feedback_${currentLang}`] : 'Miss: ' + sData[`feedback_${currentLang}`], false);
+    }
+    
+    card.style.transition = 'all 0.3s ease'; card.style.opacity = '0';
+    card.style.transform = `translate(-50%, 50px) scale(0.2)`;
+    setTimeout(() => { card.remove(); updateUI(); setTimeout(spawnCardFlow, 100); }, 300);
+}
+
+function createParticles(x, y, color) {
+    const parentRect = els.app.getBoundingClientRect();
+    const relX = x - parentRect.left;
+    const relY = y - parentRect.top;
+    
+    for(let i=0; i<20; i++) {
+        let p = document.createElement('div');
+        p.className = 'particle';
+        p.style.backgroundColor = color;
+        p.style.left = relX + 'px'; p.style.top = relY + 'px';
+        let angle = Math.random() * Math.PI * 2;
+        let diff = Math.random() * 80 + 30; // expand distance
+        p.style.setProperty('--dx', (Math.cos(angle)*diff) + 'px');
+        p.style.setProperty('--dy', (Math.sin(angle)*diff) + 'px');
+        els.app.appendChild(p);
+        setTimeout(()=>p.remove(), 700);
+    }
+}
+
+function showFeedback(txt, isCorrect) {
+    const t = els.ui.feedbackToast;
+    t.innerText = txt; t.className = `feedback-toast ${isCorrect?'correct':'wrong'}`;
+    setTimeout(()=>t.classList.add('hidden'), 1200);
+}
+
+function checkComboMilestone() {
+    const c = STATE.combo;
+    if(c === 3 || c === 5 || c === 8 || c === 12) {
+        const msgsEn = {3:'Nice Drop!', 5:'Hot Streak!', 8:'Risk Radar!', 12:'Unstoppable!'};
+        const msgsZh = {3:'漂亮！', 5:'手感火熱！', 8:'風險雷達！', 12:'無人能擋！'};
+        const txt = currentLang === 'zh' ? msgsZh[c] : msgsEn[c];
+        
+        const t = els.ui.comboToast;
+        t.innerText = `${c} Combo: ${txt}`; t.classList.remove('hidden');
+        t.style.animation = 'none'; t.offsetHeight; t.style.animation = 'megaFloat 1.2s ease-out forwards';
+    }
+}
+
+// QR
+function generateQR() {
+    new QRCode(els.qrWrapper, { text: window.location.href, width: 140, height: 140, colorDark: "#00ffff", colorLight: "#111" });
+}
+function showQR() { els.qrModal.classList.remove('hidden'); }
+function hideQR() { els.qrModal.classList.add('hidden'); }
+
+window.addEventListener('DOMContentLoaded', init);
