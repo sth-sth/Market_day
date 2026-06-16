@@ -59,7 +59,7 @@ vercel --prod
 
 - `server.js` is for local development only.
 - Vercel serves the static files (`index.html`, `app.js`, `data.js`, `styles.css`) directly.
-- `vercel.json` is included to force static serving from the repository root.
+- `vercel.json` explicitly disables framework auto-detection and sets the repository root as the static output directory.
 - If you previously deployed with a Node/server preset, redeploy after this config update so Vercel uses static output instead of a serverless function.
 
 ### If you still see `FUNCTION_INVOCATION_FAILED`
