@@ -1,6 +1,6 @@
 const i18n = {
     en: {
-        title: "SCoC Drop Match",
+        title: "SCoC Matching Game",
         subtitle: "Catch the Risk. Match the Right Code.",
         launchDesc: "Master the 11 key topics of CLP's Supplier Code of Conduct!",
         start: "Start Mission",
@@ -24,7 +24,7 @@ const i18n = {
         langBtn: "繁體"
     },
     zh: {
-        title: "SCoC 墜落配對",
+        title: "SCoC 配對遊戲",
         subtitle: "捕捉風險，精準配對。",
         launchDesc: "掌握 CLP 供應商行為準則的 11 大主題！",
         start: "開始任務",
@@ -83,7 +83,7 @@ const EASY_CARD_BANK = [
     { id: 'CC02', text_en: 'Decarbonisation Targets', text_zh: '減碳目標', topic: 'Climate Change' },
 
     { id: 'EH01', text_en: 'Working at Heights', text_zh: '高處工作', topic: 'Employee Health and Safety' },
-    { id: 'EH02', text_en: 'Hazardous Chemicals', text_zh: '危險化學品', topic: 'Employee Health and Safety' },
+    { id: 'EH02', text_en: 'Hazardous Chemicals exposure during working', text_zh: '工作期間接觸危險化學品', topic: 'Employee Health and Safety' },
 
     { id: 'LH01', text_en: 'Child Labour', text_zh: '童工', topic: 'Labour Practices and Human Rights' },
     { id: 'LH02', text_en: 'Forced Labour', text_zh: '強迫勞動', topic: 'Labour Practices and Human Rights' },

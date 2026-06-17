@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SCoC Drop Match</title>
+    <title>SCoC Matching Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
         .hidden { display: none !important; }
@@ -16,11 +19,16 @@
     <div id="app" class="app-container">
         <!-- Launch Screen -->
         <section id="launch-screen" class="screen flex-center active">
-            <h1 data-i18n="title">SCoC 墜落配對</h1>
-            <p class="subtitle" data-i18n="subtitle">捕捉風險，精準配對。</p>
-            <p data-i18n="launchDesc" style="margin-bottom:30px; font-weight:bold;">掌握 CLP 供應商行為準則的 11 大主題！</p>
-            <button id="btn-start" class="btn btn-neon" data-i18n="start">開始任務</button>
-            <button id="btn-show-qr-launch" class="btn btn-outline" data-i18n="shareBtn">分享遊戲</button>
+            <div class="glass-panel launch-panel">
+                <p class="launch-kicker">CLP Supplier Code of Conduct</p>
+                <h1 data-i18n="title">SCoC 配對遊戲</h1>
+                <p class="subtitle" data-i18n="subtitle">捕捉風險，精準配對。</p>
+                <p class="launch-desc" data-i18n="launchDesc">掌握 CLP 供應商行為準則的 11 大主題！</p>
+                <div class="launch-actions">
+                    <button id="btn-start" class="btn btn-neon" data-i18n="start">開始任務</button>
+                    <button id="btn-show-qr-launch" class="btn btn-outline" data-i18n="shareBtn">分享遊戲</button>
+                </div>
+            </div>
         </section>
 
         <!-- Pre-Game SCoC Check -->
@@ -40,7 +48,7 @@
         <!-- Main Game -->
         <section id="game-ui" class="screen hidden">
             <div class="header">
-                <div>CLP SCoC</div>
+                <div class="header-title">CLP SCoC</div>
                 <div class="stats">
                     <div class="stat-box"><span data-i18n="score">分數</span><strong id="score">0</strong></div>
                     <div class="stat-box"><span data-i18n="time">時間</span><strong id="time">60</strong></div>
