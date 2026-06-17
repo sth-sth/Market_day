@@ -5,10 +5,11 @@ const i18n = {
         launchDesc: "Master the 11 key topics of CLP's Supplier Code of Conduct!",
         start: "Start Mission",
         shareBtn: "Share via QR",
-        howTo: "Mission Briefing",
-        tutDesc1: "Drag falling events into the correct SCoC bucket below.",
-        tutDesc2: "11 Categories. 60 Seconds. Build combos for massive points!",
-        gotIt: "Let's Go!",
+        precheckTitle: "Supplier Declaration",
+        precheckDesc: "Assume you are a supplier. Will you follow CLP's Supplier Code of Conduct (SCoC)?",
+        precheckNote: "Choose Yes to start the game. Choose No to fail immediately.",
+        precheckYes: "Yes, I Will Follow",
+        precheckNo: "No, I Will Not",
         score: "SCORE",
         time: "TIME",
         lives: "LIVES",
@@ -28,10 +29,11 @@ const i18n = {
         launchDesc: "掌握 CLP 供應商行為準則的 11 大主題！",
         start: "開始任務",
         shareBtn: "分享遊戲",
-        howTo: "任務簡報",
-        tutDesc1: "將掉落的危險事件卡快速拖拽到對應的準則類別中。",
-        tutDesc2: "11個主題，60秒挑戰。連續答對獲取超高分！",
-        gotIt: "出發！",
+        precheckTitle: "供應商聲明",
+        precheckDesc: "假設你是一名供應商，你是否願意遵守 CLP 供應商行為守則（SCoC）？",
+        precheckNote: "選擇「願意」即可開始遊戲；選擇「不願意」會直接失敗。",
+        precheckYes: "願意遵守",
+        precheckNo: "不願意遵守",
         score: "分數",
         time: "時間",
         lives: "生命",
@@ -62,38 +64,49 @@ const TOPICS = [
 ];
 
 const CARD_BANK = [
-    { id: 'LC01', text_en: 'Follow local laws where you operate.', text_zh: '遵守營運地法律法規。', topic: 'Legal Compliance', type: 'Must' },
-    { id: 'LC02', text_en: 'Ensure exports meet destination regulations.', text_zh: '出口產品符合目的地法規。', topic: 'Legal Compliance', type: 'Must' },
+    { id: 'LC01', text_en: 'Business licenses', text_zh: '營業牌照', topic: 'Legal Compliance' },
+    { id: 'LC02', text_en: 'Export compliance', text_zh: '出口合規', topic: 'Legal Compliance' },
+    { id: 'LC03', text_en: 'Sanctions risk', text_zh: '制裁風險', topic: 'Legal Compliance' },
 
-    { id: 'BE01', text_en: 'Operate honestly, transparently, and professionally.', text_zh: '以誠信、透明、專業方式營運。', topic: 'Business Ethics', type: 'Must' },
-    { id: 'BE02', text_en: 'Do not offer gifts or benefits to CLP staff.', text_zh: '不得向 CLP 員工提供金錢或利益。', topic: 'Business Ethics', type: 'Must' },
+    { id: 'BE01', text_en: 'Gifts', text_zh: '饋贈', topic: 'Business Ethics' },
+    { id: 'BE02', text_en: 'Bribery', text_zh: '賄賂', topic: 'Business Ethics' },
+    { id: 'BE03', text_en: 'Conflict of interest', text_zh: '利益衝突', topic: 'Business Ethics' },
 
-    { id: 'CY01', text_en: "Help protect CLP's digital assets.", text_zh: '共同保護 CLP 數碼資產。', topic: 'Cybersecurity', type: 'Must' },
-    { id: 'CY02', text_en: 'Comply with privacy and information security laws.', text_zh: '遵守私隱及資訊安全法規。', topic: 'Cybersecurity', type: 'Must' },
+    { id: 'CY01', text_en: 'Digital assets', text_zh: '數碼資產', topic: 'Cybersecurity' },
+    { id: 'CY02', text_en: 'Data privacy', text_zh: '資料私隱', topic: 'Cybersecurity' },
+    { id: 'CY03', text_en: 'Security incident reporting', text_zh: '資訊安全事故通報', topic: 'Cybersecurity' },
 
-    { id: 'QS01', text_en: 'Follow applicable safety laws in operations.', text_zh: '業務運作須遵守安全法規。', topic: 'Quality and Safety', type: 'Must' },
-    { id: 'QS02', text_en: 'Run product recall or rectification programs.', text_zh: '發現缺陷時啟動召回或整改。', topic: 'Quality and Safety', type: 'Expectation' },
+    { id: 'QS01', text_en: 'Product quality', text_zh: '產品品質', topic: 'Quality and Safety' },
+    { id: 'QS02', text_en: 'Product recall', text_zh: '產品召回', topic: 'Quality and Safety' },
+    { id: 'QS03', text_en: 'Safety incident', text_zh: '安全事故', topic: 'Quality and Safety' },
 
-    { id: 'EM01', text_en: 'Follow environmental laws where you operate.', text_zh: '遵守營運地環境法律法規。', topic: 'Environmental Management', type: 'Must' },
-    { id: 'EM02', text_en: 'Assess environmental aspects and risks.', text_zh: '識別並評估環境因素與風險。', topic: 'Environmental Management', type: 'Expectation' },
+    { id: 'EM01', text_en: 'Environmental laws', text_zh: '環境法規', topic: 'Environmental Management' },
+    { id: 'EM02', text_en: 'Environmental risk', text_zh: '環境風險', topic: 'Environmental Management' },
+    { id: 'EM03', text_en: 'Waste mitigation', text_zh: '廢棄物減量', topic: 'Environmental Management' },
 
-    { id: 'CC01', text_en: 'Measure and disclose greenhouse gas emissions.', text_zh: '量度並披露溫室氣體排放。', topic: 'Climate Change', type: 'Expectation' },
-    { id: 'CC02', text_en: 'Set a decarbonisation plan with targets.', text_zh: '制定減碳策略及減排目標。', topic: 'Climate Change', type: 'Expectation' },
+    { id: 'CC01', text_en: 'GHG emissions', text_zh: '溫室氣體排放', topic: 'Climate Change' },
+    { id: 'CC02', text_en: 'Decarbonisation target', text_zh: '減碳目標', topic: 'Climate Change' },
+    { id: 'CC03', text_en: 'Clean energy', text_zh: '清潔能源', topic: 'Climate Change' },
 
-    { id: 'EH01', text_en: 'Follow health and safety laws in operations.', text_zh: '業務運作須遵守職安健法規。', topic: 'Employee Health and Safety', type: 'Must' },
-    { id: 'EH02', text_en: 'Identify workplace hazards and mitigate risks.', text_zh: '識別工作危害並落實風險控制。', topic: 'Employee Health and Safety', type: 'Expectation' },
+    { id: 'EH01', text_en: 'Workplace hazards', text_zh: '工作場所危害', topic: 'Employee Health and Safety' },
+    { id: 'EH02', text_en: 'Safety training', text_zh: '安全培訓', topic: 'Employee Health and Safety' },
+    { id: 'EH03', text_en: 'Emergency response', text_zh: '緊急應變', topic: 'Employee Health and Safety' },
 
-    { id: 'LH01', text_en: 'Zero tolerance for child or forced labour.', text_zh: '對童工及強迫勞動零容忍。', topic: 'Labour Practices and Human Rights', type: 'Must' },
-    { id: 'LH02', text_en: 'Do not hire below legal minimum working age.', text_zh: '不得聘用低於法定最低年齡人士。', topic: 'Labour Practices and Human Rights', type: 'Must' },
+    { id: 'LH01', text_en: 'Child labour', text_zh: '童工', topic: 'Labour Practices and Human Rights' },
+    { id: 'LH02', text_en: 'Forced labour', text_zh: '強迫勞動', topic: 'Labour Practices and Human Rights' },
+    { id: 'LH03', text_en: 'Minimum working age', text_zh: '最低工作年齡', topic: 'Labour Practices and Human Rights' },
 
-    { id: 'DI01', text_en: 'Zero tolerance for discrimination and harassment.', text_zh: '對歧視及騷擾行為零容忍。', topic: 'Diversity and Inclusion', type: 'Must' },
-    { id: 'DI02', text_en: 'Use fair systems for hiring and evaluation.', text_zh: '招聘、薪酬及考核須公平無歧視。', topic: 'Diversity and Inclusion', type: 'Expectation' },
+    { id: 'DI01', text_en: 'Discrimination', text_zh: '歧視', topic: 'Diversity and Inclusion' },
+    { id: 'DI02', text_en: 'Harassment', text_zh: '騷擾', topic: 'Diversity and Inclusion' },
+    { id: 'DI03', text_en: 'Fair recruitment', text_zh: '公平招聘', topic: 'Diversity and Inclusion' },
 
-    { id: 'CR01', text_en: 'Keep grievance channels open to communities.', text_zh: '向社區保持公開申訴溝通渠道。', topic: 'Community Relations', type: 'Expectation' },
-    { id: 'CR02', text_en: 'Actively support local communities.', text_zh: '積極支持業務所在地社區。', topic: 'Community Relations', type: 'Expectation' },
+    { id: 'CR01', text_en: 'Community risk', text_zh: '社區風險', topic: 'Community Relations' },
+    { id: 'CR02', text_en: 'Grievance channel', text_zh: '申訴渠道', topic: 'Community Relations' },
+    { id: 'CR03', text_en: 'Community support', text_zh: '社區支援', topic: 'Community Relations' },
 
-    { id: 'SC01', text_en: 'Track upstream suppliers against this Code.', text_zh: '按本守則監察上游供應商表現。', topic: 'Supply Chain Management', type: 'Expectation' },
-    { id: 'SC02', text_en: 'Implement robust upstream supplier programs.', text_zh: '建立完善上游供應商管理計劃。', topic: 'Supply Chain Management', type: 'Expectation' }
+    { id: 'SC01', text_en: 'Upstream suppliers', text_zh: '上游供應商', topic: 'Supply Chain Management' },
+    { id: 'SC02', text_en: 'Risk ranking', text_zh: '風險分級', topic: 'Supply Chain Management' },
+    { id: 'SC03', text_en: 'Supplier audit', text_zh: '供應商審核', topic: 'Supply Chain Management' }
 ];
 
 const TOPIC_META = {
@@ -123,14 +136,13 @@ const buckets = TOPICS.map((topic) => {
 
 const cardsData = CARD_BANK.map((card) => {
     const bucketMeta = TOPIC_META[card.topic];
-    const zhType = card.type === 'Must' ? '必須' : '期望';
     return {
         bucket: bucketMeta.id,
-        tag_en: card.type,
-        tag_zh: zhType,
+        tag_en: card.id,
+        tag_zh: card.id,
         text_en: card.text_en,
         text_zh: card.text_zh,
-        feedback_en: `Answer: ${card.topic} (${card.id})`,
+        feedback_en: `Answer: ${card.topic}`,
         feedback_zh: `答案：${bucketMeta.label_zh}（${card.id}）`
     };
 });

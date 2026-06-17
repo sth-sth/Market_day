@@ -87,6 +87,9 @@ body {
 #launch-screen h1 { font-size: 3rem; margin-bottom: 10px; color: #fff; text-shadow: 0 0 15px var(--primary); line-height: 1.1; }
 .subtitle { color: var(--primary); font-size: 1.1rem; margin-bottom: 25px; }
 .tut-icon { font-size: 3rem; margin-bottom: 15px; animation: bounce 2s infinite; }
+.precheck-desc { line-height: 1.5; }
+.precheck-note { margin-top: 10px; color: var(--primary); font-weight: 700; line-height: 1.4; }
+.choice-actions { width: 100%; }
 
 /* Game UI */
 .header {

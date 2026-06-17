@@ -21,7 +21,7 @@ const els = {
     app: document.getElementById('app'),
     screens: {
         launch: document.getElementById('launch-screen'),
-        tutorial: document.getElementById('tutorial-overlay'),
+        precheck: document.getElementById('precheck-overlay'),
         game: document.getElementById('game-ui'),
         pause: document.getElementById('pause-overlay'),
         settlement: document.getElementById('settlement-screen')
@@ -53,12 +53,13 @@ function init() {
 
 function bindEvents() {
     document.getElementById('btn-lang-toggle').addEventListener('click', toggleLang);
-    document.getElementById('btn-start').addEventListener('click', openTutorial);
-    document.getElementById('btn-got-it').addEventListener('click', startGame);
+    document.getElementById('btn-start').addEventListener('click', openPrecheck);
+    document.getElementById('btn-scoc-yes').addEventListener('click', startGame);
+    document.getElementById('btn-scoc-no').addEventListener('click', rejectScoc);
     document.getElementById('btn-pause').addEventListener('click', pauseGame);
     document.getElementById('btn-resume').addEventListener('click', resumeGame);
     document.getElementById('btn-quit').addEventListener('click', quitGame);
-    document.getElementById('btn-play-again').addEventListener('click', startGame);
+    document.getElementById('btn-play-again').addEventListener('click', openPrecheck);
     
     document.getElementById('btn-show-qr-launch').addEventListener('click', showQR);
     document.getElementById('btn-show-qr-settlement').addEventListener('click', showQR);
@@ -70,8 +71,37 @@ function bindEvents() {
     }, { passive: false });
 }
 
-function openTutorial() {
-    showScreen('tutorial');
+function openPrecheck() {
+    showScreen('precheck');
+}
+
+function rejectScoc() {
+    STATE.isPlaying = false;
+    clearInterval(STATE.timerInterval);
+    clearInterval(STATE.spawnWatchdog);
+
+    if (STATE.activeCard) {
+        STATE.activeCard.remove();
+        STATE.activeCard = null;
+    }
+
+    STATE.score = 0;
+    STATE.timeRemaining = 60;
+    STATE.combo = 0;
+    STATE.maxCombo = 0;
+    STATE.lives = 0;
+    STATE.totalCards = 0;
+    STATE.correctDrops = 0;
+    updateUI();
+
+    document.getElementById('final-score').innerText = '0';
+    document.getElementById('final-accuracy').innerText = '0%';
+    document.getElementById('final-title').innerText = currentLang === 'zh' ? '供應商聲明失敗' : 'Declaration Failed';
+    document.getElementById('final-reason').innerText = currentLang === 'zh'
+        ? '你選擇不遵守 CLP 供應商行為守則，任務在開始前已直接失敗。'
+        : "You chose not to follow CLP's Supplier Code of Conduct. Mission failed before the game started.";
+
+    showScreen('settlement');
 }
 
 // Language Logic
