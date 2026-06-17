@@ -63,50 +63,39 @@ const TOPICS = [
     'Supply Chain Management'
 ];
 
-const CARD_BANK = [
-    { id: 'LC01', text_en: 'Business licenses', text_zh: '營業牌照', topic: 'Legal Compliance' },
-    { id: 'LC02', text_en: 'Export compliance', text_zh: '出口合規', topic: 'Legal Compliance' },
-    { id: 'LC03', text_en: 'Sanctions risk', text_zh: '制裁風險', topic: 'Legal Compliance' },
+const EASY_CARD_BANK = [
+    { id: 'LC01', text_en: 'Licenses', text_zh: '牌照', topic: 'Legal Compliance' },
+    { id: 'LC02', text_en: 'Sanctions', text_zh: '制裁', topic: 'Legal Compliance' },
 
     { id: 'BE01', text_en: 'Gifts', text_zh: '饋贈', topic: 'Business Ethics' },
-    { id: 'BE02', text_en: 'Bribery', text_zh: '賄賂', topic: 'Business Ethics' },
-    { id: 'BE03', text_en: 'Conflict of interest', text_zh: '利益衝突', topic: 'Business Ethics' },
+    { id: 'BE02', text_en: 'Conflict of Interest', text_zh: '利益衝突', topic: 'Business Ethics' },
 
-    { id: 'CY01', text_en: 'Digital assets', text_zh: '數碼資產', topic: 'Cybersecurity' },
-    { id: 'CY02', text_en: 'Data privacy', text_zh: '資料私隱', topic: 'Cybersecurity' },
-    { id: 'CY03', text_en: 'Security incident reporting', text_zh: '資訊安全事故通報', topic: 'Cybersecurity' },
+    { id: 'CY01', text_en: 'Data Privacy', text_zh: '資料私隱', topic: 'Cybersecurity' },
+    { id: 'CY02', text_en: 'Digital Assets', text_zh: '數碼資產', topic: 'Cybersecurity' },
 
-    { id: 'QS01', text_en: 'Product quality', text_zh: '產品品質', topic: 'Quality and Safety' },
-    { id: 'QS02', text_en: 'Product recall', text_zh: '產品召回', topic: 'Quality and Safety' },
-    { id: 'QS03', text_en: 'Safety incident', text_zh: '安全事故', topic: 'Quality and Safety' },
+    { id: 'QS01', text_en: 'Product Recall', text_zh: '產品召回', topic: 'Quality and Safety' },
+    { id: 'QS02', text_en: 'Product Quality', text_zh: '產品品質', topic: 'Quality and Safety' },
 
-    { id: 'EM01', text_en: 'Environmental laws', text_zh: '環境法規', topic: 'Environmental Management' },
-    { id: 'EM02', text_en: 'Environmental risk', text_zh: '環境風險', topic: 'Environmental Management' },
-    { id: 'EM03', text_en: 'Waste mitigation', text_zh: '廢棄物減量', topic: 'Environmental Management' },
+    { id: 'EM01', text_en: 'Waste', text_zh: '廢棄物', topic: 'Environmental Management' },
+    { id: 'EM02', text_en: 'Environmental Risk', text_zh: '環境風險', topic: 'Environmental Management' },
 
-    { id: 'CC01', text_en: 'GHG emissions', text_zh: '溫室氣體排放', topic: 'Climate Change' },
-    { id: 'CC02', text_en: 'Decarbonisation target', text_zh: '減碳目標', topic: 'Climate Change' },
-    { id: 'CC03', text_en: 'Clean energy', text_zh: '清潔能源', topic: 'Climate Change' },
+    { id: 'CC01', text_en: 'GHG Emissions', text_zh: '溫室氣體排放', topic: 'Climate Change' },
+    { id: 'CC02', text_en: 'Clean Energy', text_zh: '清潔能源', topic: 'Climate Change' },
 
-    { id: 'EH01', text_en: 'Workplace hazards', text_zh: '工作場所危害', topic: 'Employee Health and Safety' },
-    { id: 'EH02', text_en: 'Safety training', text_zh: '安全培訓', topic: 'Employee Health and Safety' },
-    { id: 'EH03', text_en: 'Emergency response', text_zh: '緊急應變', topic: 'Employee Health and Safety' },
+    { id: 'EH01', text_en: 'Workplace Hazards', text_zh: '工作場所危害', topic: 'Employee Health and Safety' },
+    { id: 'EH02', text_en: 'Safety Training', text_zh: '安全培訓', topic: 'Employee Health and Safety' },
 
-    { id: 'LH01', text_en: 'Child labour', text_zh: '童工', topic: 'Labour Practices and Human Rights' },
-    { id: 'LH02', text_en: 'Forced labour', text_zh: '強迫勞動', topic: 'Labour Practices and Human Rights' },
-    { id: 'LH03', text_en: 'Minimum working age', text_zh: '最低工作年齡', topic: 'Labour Practices and Human Rights' },
+    { id: 'LH01', text_en: 'Child Labour', text_zh: '童工', topic: 'Labour Practices and Human Rights' },
+    { id: 'LH02', text_en: 'Forced Labour', text_zh: '強迫勞動', topic: 'Labour Practices and Human Rights' },
 
-    { id: 'DI01', text_en: 'Discrimination', text_zh: '歧視', topic: 'Diversity and Inclusion' },
-    { id: 'DI02', text_en: 'Harassment', text_zh: '騷擾', topic: 'Diversity and Inclusion' },
-    { id: 'DI03', text_en: 'Fair recruitment', text_zh: '公平招聘', topic: 'Diversity and Inclusion' },
+    { id: 'DI01', text_en: 'Harassment', text_zh: '騷擾', topic: 'Diversity and Inclusion' },
+    { id: 'DI02', text_en: 'Discrimination', text_zh: '歧視', topic: 'Diversity and Inclusion' },
 
-    { id: 'CR01', text_en: 'Community risk', text_zh: '社區風險', topic: 'Community Relations' },
-    { id: 'CR02', text_en: 'Grievance channel', text_zh: '申訴渠道', topic: 'Community Relations' },
-    { id: 'CR03', text_en: 'Community support', text_zh: '社區支援', topic: 'Community Relations' },
+    { id: 'CR01', text_en: 'Grievance Channel', text_zh: '申訴渠道', topic: 'Community Relations' },
+    { id: 'CR02', text_en: 'Community Support', text_zh: '社區支援', topic: 'Community Relations' },
 
-    { id: 'SC01', text_en: 'Upstream suppliers', text_zh: '上游供應商', topic: 'Supply Chain Management' },
-    { id: 'SC02', text_en: 'Risk ranking', text_zh: '風險分級', topic: 'Supply Chain Management' },
-    { id: 'SC03', text_en: 'Supplier audit', text_zh: '供應商審核', topic: 'Supply Chain Management' }
+    { id: 'SC01', text_en: 'Supplier Audit', text_zh: '供應商審核', topic: 'Supply Chain Management' },
+    { id: 'SC02', text_en: 'Risk Ranking', text_zh: '風險分級', topic: 'Supply Chain Management' }
 ];
 
 const TOPIC_META = {
@@ -134,7 +123,7 @@ const buckets = TOPICS.map((topic) => {
     };
 });
 
-const cardsData = CARD_BANK.map((card) => {
+const cardsData = EASY_CARD_BANK.map((card) => {
     const bucketMeta = TOPIC_META[card.topic];
     return {
         bucket: bucketMeta.id,
