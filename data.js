@@ -64,38 +64,38 @@ const TOPICS = [
 ];
 
 const EASY_CARD_BANK = [
-    { id: 'LC01', text_en: 'Licenses', text_zh: '牌照', topic: 'Legal Compliance' },
+    { id: 'LC01', text_en: 'Business Licences', text_zh: '營業牌照', topic: 'Legal Compliance' },
     { id: 'LC02', text_en: 'Sanctions', text_zh: '制裁', topic: 'Legal Compliance' },
 
-    { id: 'BE01', text_en: 'Gifts', text_zh: '饋贈', topic: 'Business Ethics' },
+    { id: 'BE01', text_en: 'Gifts to CLP Staff', text_zh: '向中電員工提供饋贈', topic: 'Business Ethics' },
     { id: 'BE02', text_en: 'Conflict of Interest', text_zh: '利益衝突', topic: 'Business Ethics' },
 
-    { id: 'CY01', text_en: 'Data Privacy', text_zh: '資料私隱', topic: 'Cybersecurity' },
-    { id: 'CY02', text_en: 'Digital Assets', text_zh: '數碼資產', topic: 'Cybersecurity' },
+    { id: 'CY01', text_en: 'CLP Digital Assets', text_zh: '中電數碼資產', topic: 'Cybersecurity' },
+    { id: 'CY02', text_en: 'Data Privacy', text_zh: '資料私隱', topic: 'Cybersecurity' },
 
     { id: 'QS01', text_en: 'Product Recall', text_zh: '產品召回', topic: 'Quality and Safety' },
-    { id: 'QS02', text_en: 'Product Quality', text_zh: '產品品質', topic: 'Quality and Safety' },
+    { id: 'QS02', text_en: 'Quality Defect', text_zh: '品質缺陷', topic: 'Quality and Safety' },
 
-    { id: 'EM01', text_en: 'Waste', text_zh: '廢棄物', topic: 'Environmental Management' },
-    { id: 'EM02', text_en: 'Environmental Risk', text_zh: '環境風險', topic: 'Environmental Management' },
+    { id: 'EM01', text_en: 'Environmental Management System', text_zh: '環境管理系統', topic: 'Environmental Management' },
+    { id: 'EM02', text_en: 'Waste Impact', text_zh: '廢棄物影響', topic: 'Environmental Management' },
 
     { id: 'CC01', text_en: 'GHG Emissions', text_zh: '溫室氣體排放', topic: 'Climate Change' },
-    { id: 'CC02', text_en: 'Clean Energy', text_zh: '清潔能源', topic: 'Climate Change' },
+    { id: 'CC02', text_en: 'Decarbonisation Targets', text_zh: '減碳目標', topic: 'Climate Change' },
 
-    { id: 'EH01', text_en: 'Workplace Hazards', text_zh: '工作場所危害', topic: 'Employee Health and Safety' },
-    { id: 'EH02', text_en: 'Safety Training', text_zh: '安全培訓', topic: 'Employee Health and Safety' },
+    { id: 'EH01', text_en: 'Working at Heights', text_zh: '高處工作', topic: 'Employee Health and Safety' },
+    { id: 'EH02', text_en: 'Hazardous Chemicals', text_zh: '危險化學品', topic: 'Employee Health and Safety' },
 
     { id: 'LH01', text_en: 'Child Labour', text_zh: '童工', topic: 'Labour Practices and Human Rights' },
     { id: 'LH02', text_en: 'Forced Labour', text_zh: '強迫勞動', topic: 'Labour Practices and Human Rights' },
 
-    { id: 'DI01', text_en: 'Harassment', text_zh: '騷擾', topic: 'Diversity and Inclusion' },
-    { id: 'DI02', text_en: 'Discrimination', text_zh: '歧視', topic: 'Diversity and Inclusion' },
+    { id: 'DI01', text_en: 'Discrimination', text_zh: '歧視', topic: 'Diversity and Inclusion' },
+    { id: 'DI02', text_en: 'Harassment', text_zh: '騷擾', topic: 'Diversity and Inclusion' },
 
-    { id: 'CR01', text_en: 'Grievance Channel', text_zh: '申訴渠道', topic: 'Community Relations' },
-    { id: 'CR02', text_en: 'Community Support', text_zh: '社區支援', topic: 'Community Relations' },
+    { id: 'CR01', text_en: 'Community Grievance', text_zh: '社區申訴', topic: 'Community Relations' },
+    { id: 'CR02', text_en: 'Local Community Support', text_zh: '本地社區支援', topic: 'Community Relations' },
 
-    { id: 'SC01', text_en: 'Supplier Audit', text_zh: '供應商審核', topic: 'Supply Chain Management' },
-    { id: 'SC02', text_en: 'Risk Ranking', text_zh: '風險分級', topic: 'Supply Chain Management' }
+    { id: 'SC01', text_en: 'Supplier Risk Ranking', text_zh: '供應商風險分級', topic: 'Supply Chain Management' },
+    { id: 'SC02', text_en: 'Supplier Sustainability Audit', text_zh: '供應商可持續發展審核', topic: 'Supply Chain Management' }
 ];
 
 const TOPIC_META = {
