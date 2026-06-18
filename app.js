@@ -19,6 +19,7 @@ const STATE = {
 
 const els = {
     app: document.getElementById('app'),
+    viewButtons: document.querySelectorAll('.view-btn'),
     screens: {
         launch: document.getElementById('launch-screen'),
         precheck: document.getElementById('precheck-overlay'),
@@ -46,6 +47,7 @@ const els = {
 // Initial Setup
 function init() {
     applyLanguage();
+    applyViewMode(localStorage.getItem('marketDayViewMode') || 'phone');
     renderBuckets();
     bindEvents();
     setupQRLink();
@@ -53,6 +55,9 @@ function init() {
 
 function bindEvents() {
     document.getElementById('btn-lang-toggle').addEventListener('click', toggleLang);
+    els.viewButtons.forEach((button) => {
+        button.addEventListener('click', () => applyViewMode(button.dataset.view));
+    });
     document.getElementById('btn-start').addEventListener('click', openPrecheck);
     document.getElementById('btn-scoc-yes').addEventListener('click', startGame);
     document.getElementById('btn-scoc-no').addEventListener('click', rejectScoc);
@@ -125,6 +130,16 @@ function applyLanguage() {
         STATE.activeCard.querySelector('.card-text').innerText = sourceData[`text_${currentLang}`];
     }
     refreshQRMeta();
+}
+
+function applyViewMode(mode) {
+    const nextMode = mode === 'laptop' ? 'laptop' : 'phone';
+    document.body.classList.remove('view-phone', 'view-laptop');
+    document.body.classList.add(`view-${nextMode}`);
+    els.viewButtons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.view === nextMode);
+    });
+    localStorage.setItem('marketDayViewMode', nextMode);
 }
 
 // UI Renderers

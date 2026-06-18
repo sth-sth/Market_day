@@ -1,7 +1,7 @@
 :root {
-    --primary: #78c4b6;
-    --secondary: #f0b37a;
-    --accent-soft: #8ea9ff;
+    --primary: #8dc7bd;
+    --secondary: #d9b88f;
+    --accent-soft: #95a8df;
     --bg-dark: #08131d;
     --bg-surface: #102231;
     --text-light: #f4f7fb;
@@ -11,25 +11,29 @@
     --glass-bg: rgba(11, 24, 36, 0.8);
     --glass-border: rgba(144, 189, 197, 0.22);
     --shadow-soft: 0 18px 45px rgba(2, 10, 18, 0.34);
-    --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-display: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+    --font-main: 'Manrope', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Manrope', 'Noto Sans TC', sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
-/* Animated Cyberpunk Background */
 body {
     font-family: var(--font-main);
     color: var(--text-light);
-    height: 100vh; height: 100dvh;
-    overflow: hidden; position: fixed; width: 100vw;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 72px 14px 14px;
     background:
-        radial-gradient(circle at top, rgba(120, 196, 182, 0.14), transparent 32%),
-        radial-gradient(circle at 85% 18%, rgba(240, 179, 122, 0.12), transparent 24%),
-        linear-gradient(-35deg, #07111a, #0d1c29, #0a1621, #132536);
-    background-size: 400% 400%;
-    animation: gradientBG 22s ease infinite;
+        radial-gradient(circle at top, rgba(141, 199, 189, 0.16), transparent 34%),
+        radial-gradient(circle at 88% 14%, rgba(149, 168, 223, 0.14), transparent 24%),
+        linear-gradient(145deg, #eef2f5 0%, #d7e0e7 22%, #b8c5cf 52%, #99a8b6 100%);
     touch-action: manipulation;
+    overscroll-behavior: none;
 }
 
 body::before {
@@ -38,21 +42,182 @@ body::before {
     inset: 0;
     pointer-events: none;
     background:
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 34px 34px;
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent 90%);
-    opacity: 0.22;
+        linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.28), transparent 92%);
+    opacity: 0.2;
 }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 100%, rgba(8, 19, 29, 0.16), transparent 40%);
+}
+
+body.view-phone {
+    --device-width: min(460px, 100%);
+    --device-height: min(920px, calc(100dvh - 86px));
+    --frame-radius: 38px;
+    --frame-padding: 10px;
+    --frame-gap: 8px;
+    --bucket-width: 82px;
+    --card-width: 220px;
+}
+
+body.view-laptop {
+    --device-width: min(1180px, 100%);
+    --device-height: min(820px, calc(100dvh - 92px));
+    --frame-radius: 30px;
+    --frame-padding: 12px;
+    --frame-gap: 8px;
+    --bucket-width: 104px;
+    --card-width: 252px;
+}
+
+.top-controls {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 120;
+    width: min(calc(100% - 24px), 720px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-switch {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(8, 19, 29, 0.14);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(7, 17, 26, 0.08);
+    box-shadow: 0 10px 22px rgba(33, 55, 74, 0.12);
+}
+
+.view-btn,
+.lang-btn {
+    border: none;
+    border-radius: 999px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.view-btn {
+    min-width: 84px;
+    padding: 7px 12px;
+    background: transparent;
+    color: #243746;
+    cursor: pointer;
+    font-size: 0.82rem;
+    line-height: 1;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.view-btn.active {
+    background: rgba(8, 19, 29, 0.92);
+    color: #f4f7fb;
+    box-shadow: 0 8px 20px rgba(8, 19, 29, 0.24);
+}
+
+.experience-shell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.device-frame {
+    width: min(100%, var(--device-width));
+    height: var(--device-height);
+    display: flex;
+    flex-direction: column;
+    gap: var(--frame-gap);
+    padding: var(--frame-padding);
+    border-radius: var(--frame-radius);
+    background: linear-gradient(180deg, rgba(17, 31, 46, 0.92), rgba(10, 20, 30, 0.96));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 28px 64px rgba(8, 19, 29, 0.24), 0 10px 24px rgba(255, 255, 255, 0.2);
+}
+
+.device-hardware {
+    display: none;
+    flex: 0 0 auto;
+}
+
+.phone-hardware {
+    justify-content: center;
+    align-items: center;
+    height: 10px;
+}
+
+.phone-speaker {
+    width: 68px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(226, 235, 242, 0.2);
+}
+
+.laptop-hardware {
+    align-items: center;
+    justify-content: space-between;
+    min-height: 24px;
+    padding: 0 4px;
+}
+
+.window-dots {
+    display: inline-flex;
+    gap: 6px;
+}
+
+.window-dots span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.window-dots span:nth-child(1) { background: #ff7b72; }
+.window-dots span:nth-child(2) { background: #f2cc60; }
+.window-dots span:nth-child(3) { background: #68c59d; }
+
+.window-pill {
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #d6e1eb;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.view-phone .phone-hardware,
+body.view-laptop .laptop-hardware {
+    display: flex;
+}
+
+.device-content {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    border-radius: calc(var(--frame-radius) - 10px);
+    background: #08131d;
 }
 
 .app-container {
-    position: relative; width: 100%; height: 100%; max-width: 500px; margin: 0 auto;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    margin: 0 auto;
     overflow: hidden;
     isolation: isolate;
 }
@@ -70,7 +235,7 @@ body::before {
 .glass-panel {
     background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border); border-radius: 24px;
-    padding: 32px 22px; text-align: center; width: 90%; max-width: 360px;
+    padding: 32px 22px; text-align: center; width: min(100%, 90%); max-width: 360px;
     box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -105,12 +270,15 @@ body::before {
 }
 
 .lang-btn {
-    position: absolute; top: 15px; right: 15px; z-index: 100;
-    background: rgba(7, 17, 26, 0.66); color: var(--text-light); border: 1px solid rgba(120, 196, 182, 0.38);
-    padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+    background: rgba(8, 19, 29, 0.92);
+    color: var(--text-light);
+    border: 1px solid rgba(120, 196, 182, 0.24);
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    line-height: 1;
     touch-action: manipulation;
-    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 24px rgba(8, 19, 29, 0.18);
 }
 
 .btn, .icon-btn, .close-btn {
@@ -137,7 +305,7 @@ body::before {
     height: 220px;
     top: 10%;
     left: -70px;
-    background: radial-gradient(circle, rgba(120, 196, 182, 0.18), transparent 68%);
+    background: radial-gradient(circle, rgba(120, 196, 182, 0.14), transparent 68%);
 }
 
 #launch-screen::after {
@@ -145,13 +313,14 @@ body::before {
     height: 260px;
     right: -110px;
     bottom: 8%;
-    background: radial-gradient(circle, rgba(142, 169, 255, 0.18), transparent 70%);
+    background: radial-gradient(circle, rgba(149, 168, 223, 0.15), transparent 70%);
 }
 
 .launch-panel {
     position: relative;
     z-index: 1;
-    max-width: 430px;
+    width: min(100%, 460px);
+    max-width: 460px;
     padding: 42px 30px 30px;
     background: linear-gradient(180deg, rgba(7, 17, 26, 0.96), rgba(10, 22, 33, 0.98));
     border-color: rgba(144, 189, 197, 0.24);
@@ -181,15 +350,17 @@ body::before {
     margin-bottom: 12px;
     color: #fff;
     text-shadow: none;
-    line-height: 1.05;
-    letter-spacing: -0.03em;
-    white-space: nowrap;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
 }
 .subtitle {
     color: #d6e1eb;
-    font-size: 1.05rem;
+    font-size: 1.08rem;
     margin-bottom: 14px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.55;
     max-width: 28ch;
     margin-left: auto;
@@ -197,8 +368,8 @@ body::before {
 }
 .launch-desc {
     margin-bottom: 24px;
-    font-weight: 600;
-    color: #f1d0a8;
+    font-weight: 700;
+    color: #e6c9a7;
     line-height: 1.6;
     max-width: 32ch;
     margin-left: auto;
@@ -233,9 +404,10 @@ body::before {
 }
 .header-title {
     font-family: var(--font-display);
-    font-size: 0.98rem;
+    font-size: 0.96rem;
     letter-spacing: 0.08em;
     color: #dce8f2;
+    font-weight: 800;
 }
 .stats { display: flex; gap: 8px; }
 .stat-box {
@@ -319,7 +491,7 @@ body::before {
     100% { transform: scale(1); opacity: 1; }
 }
 .risk-card {
-    position: absolute; width: 220px; padding: 18px;
+    position: absolute; width: var(--card-width); padding: 18px;
     background: linear-gradient(180deg, rgba(17, 30, 42, 0.96), rgba(11, 22, 33, 0.98));
     border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); cursor: grab; z-index: 50;
     left: 50%; display: flex; flex-direction: column; gap: 10px;
@@ -344,7 +516,7 @@ body::before {
     position: absolute;
     top: 10px;
     bottom: 10px;
-    width: 82px;
+    width: var(--bucket-width);
     z-index: 80;
 }
 
@@ -477,12 +649,86 @@ body::before {
 
     .btn-outline:hover,
     .lang-btn:hover,
+    .view-btn:hover,
     .icon-btn:hover {
         background: rgba(255, 255, 255, 0.08);
     }
 }
 
+body.view-laptop .launch-panel {
+    max-width: 560px;
+}
+
+body.view-laptop #launch-screen h1 {
+    font-size: clamp(2.6rem, 4.8vw, 4.2rem);
+    max-width: 12ch;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.view-laptop .subtitle {
+    max-width: 34ch;
+    font-size: 1.12rem;
+}
+
+body.view-laptop .launch-desc {
+    max-width: 36ch;
+}
+
+body.view-laptop .header {
+    padding: 12px 18px;
+}
+
+body.view-laptop .header-title {
+    font-size: 1.08rem;
+}
+
+body.view-laptop .stat-box {
+    min-width: 60px;
+    padding: 8px 9px;
+}
+
+body.view-laptop .bucket {
+    border-radius: 14px;
+    padding: 6px 5px;
+}
+
+body.view-laptop .bucket .icon {
+    font-size: 1.2rem;
+}
+
+body.view-laptop .bucket .name {
+    font-size: 0.64rem;
+}
+
 @media (max-width: 420px) {
+    body {
+        padding: 64px 10px 10px;
+    }
+
+    .top-controls {
+        width: calc(100% - 20px);
+        gap: 6px;
+        align-items: stretch;
+    }
+
+    .view-switch {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .view-btn {
+        min-width: 0;
+        flex: 1;
+        padding: 7px 10px;
+        font-size: 0.74rem;
+    }
+
+    .lang-btn {
+        padding: 7px 11px;
+        font-size: 0.76rem;
+    }
+
     #launch-screen h1 {
         font-size: 2.1rem;
     }
@@ -532,7 +778,22 @@ body::before {
         font-size: 0.52rem;
     }
 
-    .risk-card {
-        width: 204px;
+    body.view-phone {
+        --card-width: 204px;
+        --bucket-width: 72px;
+        --device-height: calc(100dvh - 76px);
+    }
+}
+
+@media (max-width: 860px) {
+    body.view-laptop {
+        --device-width: calc(100vw - 20px);
+        --device-height: calc(100dvh - 78px);
+        --bucket-width: 88px;
+        --card-width: 220px;
+    }
+
+    .window-pill {
+        display: none;
     }
 }

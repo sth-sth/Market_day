@@ -21,7 +21,9 @@ const i18n = {
         settleTitle: "Challenge Complete",
         playAgain: "Play Again",
         qrTitle: "Scan & Play",
-        langBtn: "繁體"
+        langBtn: "繁體",
+        phoneView: "Phone",
+        laptopView: "Laptop"
     },
     zh: {
         title: "SCoC 配對遊戲",
@@ -45,7 +47,9 @@ const i18n = {
         settleTitle: "挑戰完成",
         playAgain: "再玩一次",
         qrTitle: "掃碼挑戰",
-        langBtn: "EN"
+        langBtn: "EN",
+        phoneView: "手機",
+        laptopView: "桌面"
     }
 };
 
