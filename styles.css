@@ -328,6 +328,11 @@ body.view-laptop .laptop-hardware {
     text-align: center;
 }
 
+.precheck-panel {
+    width: min(100%, 420px);
+    max-width: 420px;
+}
+
 .launch-kicker {
     display: inline-flex;
     align-items: center;
@@ -391,6 +396,24 @@ body.view-laptop .laptop-hardware {
 .precheck-desc { line-height: 1.6; color: #d8e2ec; }
 .precheck-note { margin-top: 10px; color: var(--secondary); font-weight: 700; line-height: 1.5; }
 .choice-actions { width: 100%; }
+
+html[lang="en"] .launch-panel {
+    width: min(100%, 520px);
+    max-width: 520px;
+}
+
+html[lang="en"] .subtitle {
+    max-width: 32ch;
+}
+
+html[lang="en"] .launch-desc {
+    max-width: 38ch;
+}
+
+html[lang="en"] .precheck-panel {
+    width: min(100%, 500px);
+    max-width: 500px;
+}
 
 /* Game UI */
 .header {
@@ -656,19 +679,51 @@ body.view-laptop .laptop-hardware {
 }
 
 body.view-laptop .launch-panel {
+    width: min(100%, 680px);
+    max-width: 560px;
+}
+
+body.view-laptop .precheck-panel {
+    width: min(100%, 460px);
+    max-width: 460px;
+}
+
+body.view-laptop .launch-panel {
+    max-width: 680px;
+}
+
+html[lang="en"] body.view-laptop .launch-panel {
+    width: min(100%, 760px);
+    max-width: 760px;
+}
+
+html[lang="en"] body.view-laptop .precheck-panel {
+    width: min(100%, 560px);
     max-width: 560px;
 }
 
 body.view-laptop #launch-screen h1 {
     font-size: clamp(2.6rem, 4.8vw, 4.2rem);
-    max-width: 12ch;
+    max-width: 15ch;
     margin-left: auto;
     margin-right: auto;
+}
+
+html[lang="en"] body.view-laptop #launch-screen h1 {
+    max-width: 16ch;
 }
 
 body.view-laptop .subtitle {
     max-width: 34ch;
     font-size: 1.12rem;
+}
+
+html[lang="en"] body.view-laptop .subtitle {
+    max-width: 38ch;
+}
+
+html[lang="en"] body.view-laptop .launch-desc {
+    max-width: 44ch;
 }
 
 body.view-laptop .launch-desc {

@@ -117,6 +117,7 @@ function toggleLang() {
 
 function applyLanguage() {
     const dict = i18n[currentLang];
+    document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (dict[key]) el.innerText = dict[key];
