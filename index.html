@@ -71,47 +71,34 @@
             </div>
         </section>
 
-        <!-- Mission Tutorial -->
-        <section id="tutorial-screen" class="screen flex-center overlay hidden" aria-label="Game tutorial">
-            <div class="tutorial-panel">
-                <div class="tutorial-art" aria-hidden="true">
-                    <img src="assets/clp-energy-crew.svg" alt="">
-                </div>
-                <div class="tutorial-copy">
-                    <div class="tutorial-meta">
-                        <p class="tutorial-kicker" data-i18n="tutorialKicker">任務小教室</p>
-                        <p id="tutorial-progress" class="tutorial-progress">1 / 3</p>
+        <!-- Topic Guide -->
+        <section id="tutorial-screen" class="screen hidden" aria-labelledby="topic-guide-title">
+            <header class="topic-guide-bar">
+                <button id="btn-close-tutorial" class="topic-guide-icon-btn" type="button" aria-label="返回開始畫面" title="返回開始畫面"><span aria-hidden="true">&#8592;</span></button>
+                <p class="topic-guide-bar-title" data-i18n="topicGuideBarTitle">開始前導讀</p>
+                <span class="topic-guide-count" aria-label="11 topics">11</span>
+            </header>
+            <div id="topic-guide-scroll" class="topic-guide-scroll">
+                <div class="topic-guide-hero">
+                    <div class="topic-guide-hero-copy">
+                        <p class="topic-guide-kicker" data-i18n="topicGuideKicker">CLP 供應商行為守則</p>
+                        <h1 id="topic-guide-title" data-i18n="topicGuideTitle">重點主題與情境例子</h1>
+                        <p class="topic-guide-intro" data-i18n="topicGuideIntro">先了解 SCoC 的主要主題。每張卡都說明其涵蓋範圍，以及遊戲中可能出現的情境例子。</p>
                     </div>
-                    <div class="tutorial-steps">
-                        <article class="tutorial-step active" data-tutorial-step="0">
-                            <span class="tutorial-step-number">01</span>
-                            <h2 data-i18n="tutorialStep1Title">讀懂風險卡</h2>
-                            <p data-i18n="tutorialStep1Body">每張卡代表一項中電供應商行為守則相關風險。閱讀內容後，找出最合適的分類。</p>
-                        </article>
-                        <article class="tutorial-step" data-tutorial-step="1" aria-hidden="true">
-                            <span class="tutorial-step-number">02</span>
-                            <h2 data-i18n="tutorialStep2Title">送到正確分類</h2>
-                            <p data-i18n="tutorialStep2Body">把卡拖到左右分類欄，也可直接點擊目標分類。連續答對能累積連擊分數。</p>
-                        </article>
-                        <article class="tutorial-step" data-tutorial-step="2" aria-hidden="true">
-                            <span class="tutorial-step-number">03</span>
-                            <h2 data-i18n="tutorialStep3Title">守護每一份合作</h2>
-                            <p data-i18n="tutorialStep3Body">在 60 秒內完成盡量多的配對；答錯或漏接會消耗一格生命能量。接著先完成供應商聲明。</p>
-                        </article>
-                    </div>
-                    <div class="tutorial-footer">
-                        <div class="tutorial-dots" aria-hidden="true">
-                            <span class="tutorial-dot active"></span>
-                            <span class="tutorial-dot"></span>
-                            <span class="tutorial-dot"></span>
-                        </div>
-                        <div class="tutorial-actions">
-                            <button id="btn-tutorial-back" class="tutorial-back-btn" type="button" aria-label="上一頁" title="上一頁" hidden><span aria-hidden="true">&#8592;</span></button>
-                            <button id="btn-tutorial-next" class="btn btn-neon" type="button">下一步</button>
-                        </div>
+                    <div class="topic-guide-hero-art" aria-hidden="true">
+                        <img src="assets/clp-energy-crew.svg" alt="">
                     </div>
                 </div>
+                <div class="topic-guide-section-heading">
+                    <p data-i18n="topicGuideSectionLabel">11 個 SCoC 主題</p>
+                    <span aria-hidden="true"></span>
+                </div>
+                <div id="topic-guide-list" class="topic-guide-list" role="list"></div>
             </div>
+            <footer class="topic-guide-footer">
+                <p data-i18n="topicGuideReady">已了解全部 11 個主題？</p>
+                <button id="btn-tutorial-continue" class="btn btn-neon" type="button" data-i18n="topicGuideContinue">前往供應商聲明</button>
+            </footer>
         </section>
 
         <!-- Pre-Game SCoC Check -->

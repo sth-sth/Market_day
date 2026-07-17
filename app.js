@@ -20,7 +20,6 @@ const STATE = {
     activeTopicIds: [],
     phase: 'idle',
     roundId: 0,
-    tutorialStep: 0,
     deck: [],
     fallSpeed: 1.05 // Extra slow descent for more answer time
 };
@@ -74,8 +73,8 @@ function bindEvents() {
         button.addEventListener('click', () => selectGameMode(button.dataset.mode));
     });
     document.getElementById('btn-start').addEventListener('click', openTutorial);
-    document.getElementById('btn-tutorial-back').addEventListener('click', () => changeTutorialStep(-1));
-    document.getElementById('btn-tutorial-next').addEventListener('click', advanceTutorial);
+    document.getElementById('btn-close-tutorial').addEventListener('click', () => showScreen('launch'));
+    document.getElementById('btn-tutorial-continue').addEventListener('click', openPrecheck);
     document.getElementById('btn-scoc-yes').addEventListener('click', startGame);
     document.getElementById('btn-scoc-no').addEventListener('click', rejectScoc);
     document.getElementById('btn-pause').addEventListener('click', pauseGame);
@@ -98,54 +97,68 @@ function openPrecheck() {
 }
 
 function openTutorial() {
-    STATE.tutorialStep = 0;
-    renderTutorial();
+    renderTopicGuide();
+    const guideScroll = document.getElementById('topic-guide-scroll');
+    if (guideScroll) guideScroll.scrollTop = 0;
     showScreen('tutorial');
 }
 
-function changeTutorialStep(change) {
-    const steps = document.querySelectorAll('.tutorial-step');
-    const lastStep = steps.length - 1;
-    STATE.tutorialStep = Math.max(0, Math.min(lastStep, STATE.tutorialStep + change));
-    renderTutorial();
-}
+function renderTopicGuide() {
+    const list = document.getElementById('topic-guide-list');
+    if (!list) return;
 
-function advanceTutorial() {
-    const steps = document.querySelectorAll('.tutorial-step');
-    if (STATE.tutorialStep >= steps.length - 1) {
-        openPrecheck();
-        return;
+    list.innerHTML = '';
+    TOPICS.forEach((topic, index) => {
+        const meta = TOPIC_META[topic];
+        const examples = cardsData.filter((card) => card.bucket === meta.id).slice(0, 2);
+        const card = document.createElement('article');
+        const indexRail = document.createElement('div');
+        const content = document.createElement('div');
+        const titleLine = document.createElement('div');
+        const icon = document.createElement('span');
+        const title = document.createElement('h2');
+        const description = document.createElement('p');
+        const exampleLabel = document.createElement('p');
+        const chipList = document.createElement('div');
+
+        card.className = 'topic-guide-card';
+        card.setAttribute('role', 'listitem');
+        card.style.setProperty('--topic-color', meta.color);
+
+        indexRail.className = 'topic-guide-index';
+        indexRail.innerText = String(index + 1).padStart(2, '0');
+
+        content.className = 'topic-guide-card-content';
+        titleLine.className = 'topic-guide-title-line';
+        icon.className = 'topic-guide-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerText = meta.guideIcon;
+        title.innerText = currentLang === 'zh' ? meta.label_zh : topic;
+        description.className = 'topic-guide-description';
+        description.innerText = meta[`description_${currentLang}`];
+        exampleLabel.className = 'topic-guide-example-label';
+        exampleLabel.innerText = i18n[currentLang].topicGuideExamples;
+        chipList.className = 'topic-guide-chip-list';
+
+        examples.forEach((example) => {
+            const chip = document.createElement('span');
+            chip.className = 'topic-guide-chip';
+            chip.innerText = example[`text_${currentLang}`];
+            chipList.appendChild(chip);
+        });
+
+        titleLine.append(icon, title);
+        content.append(titleLine, description, exampleLabel, chipList);
+        card.append(indexRail, content);
+        list.appendChild(card);
+    });
+
+    const closeButton = document.getElementById('btn-close-tutorial');
+    const closeLabel = i18n[currentLang].topicGuideClose;
+    if (closeButton) {
+        closeButton.title = closeLabel;
+        closeButton.setAttribute('aria-label', closeLabel);
     }
-    changeTutorialStep(1);
-}
-
-function renderTutorial() {
-    const steps = document.querySelectorAll('.tutorial-step');
-    if (!steps.length) return;
-
-    const lastStep = steps.length - 1;
-    STATE.tutorialStep = Math.max(0, Math.min(lastStep, STATE.tutorialStep));
-    steps.forEach((step, index) => {
-        const isActive = index === STATE.tutorialStep;
-        step.classList.toggle('active', isActive);
-        step.setAttribute('aria-hidden', String(!isActive));
-    });
-
-    document.querySelectorAll('.tutorial-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === STATE.tutorialStep);
-    });
-
-    const previous = document.getElementById('btn-tutorial-back');
-    const next = document.getElementById('btn-tutorial-next');
-    const progress = document.getElementById('tutorial-progress');
-    const actions = document.querySelector('.tutorial-actions');
-    const dict = i18n[currentLang];
-    previous.hidden = STATE.tutorialStep === 0;
-    actions.classList.toggle('is-first-step', STATE.tutorialStep === 0);
-    previous.title = dict.tutorialPrevious;
-    previous.setAttribute('aria-label', dict.tutorialPrevious);
-    next.innerText = STATE.tutorialStep === lastStep ? dict.tutorialStartDeclaration : dict.tutorialNext;
-    progress.innerText = `${STATE.tutorialStep + 1} / ${steps.length}`;
 }
 
 function rejectScoc() {
@@ -188,7 +201,7 @@ function applyLanguage() {
         if (dict[key]) el.innerText = dict[key];
     });
     updateModeUI();
-    renderTutorial();
+    renderTopicGuide();
     renderBuckets();
     if(STATE.activeCard) {
         // Soft refresh active card texts safely
