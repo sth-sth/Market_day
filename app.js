@@ -13,6 +13,13 @@ const STATE = {
     isPlaying: false,
     timerInterval: null,
     spawnWatchdog: null,
+    fallFrame: null,
+    fallRun: 0,
+    mode: 'easy',
+    activeBuckets: [],
+    activeTopicIds: [],
+    phase: 'idle',
+    roundId: 0,
     deck: [],
     fallSpeed: 1.05 // Extra slow descent for more answer time
 };
@@ -20,6 +27,7 @@ const STATE = {
 const els = {
     app: document.getElementById('app'),
     viewButtons: document.querySelectorAll('.view-btn'),
+    modeButtons: document.querySelectorAll('.mode-card'),
     screens: {
         launch: document.getElementById('launch-screen'),
         precheck: document.getElementById('precheck-overlay'),
@@ -32,6 +40,7 @@ const els = {
         time: document.getElementById('time'),
         combo: document.getElementById('combo'),
         lives: document.getElementById('lives'),
+        mode: document.getElementById('game-mode'),
         timeFill: document.getElementById('time-fill'),
         countdown: document.getElementById('countdown-overlay'),
         dropZone: document.getElementById('drop-zone'),
@@ -46,6 +55,7 @@ const els = {
 
 // Initial Setup
 function init() {
+    prepareRound();
     applyLanguage();
     applyViewMode(localStorage.getItem('marketDayViewMode') || 'phone');
     renderBuckets();
@@ -57,6 +67,9 @@ function bindEvents() {
     document.getElementById('btn-lang-toggle').addEventListener('click', toggleLang);
     els.viewButtons.forEach((button) => {
         button.addEventListener('click', () => applyViewMode(button.dataset.view));
+    });
+    els.modeButtons.forEach((button) => {
+        button.addEventListener('click', () => selectGameMode(button.dataset.mode));
     });
     document.getElementById('btn-start').addEventListener('click', openPrecheck);
     document.getElementById('btn-scoc-yes').addEventListener('click', startGame);
@@ -82,13 +95,10 @@ function openPrecheck() {
 
 function rejectScoc() {
     STATE.isPlaying = false;
-    clearInterval(STATE.timerInterval);
-    clearInterval(STATE.spawnWatchdog);
-
-    if (STATE.activeCard) {
-        STATE.activeCard.remove();
-        STATE.activeCard = null;
-    }
+    STATE.phase = 'finished';
+    STATE.roundId++;
+    clearRoundTimers();
+    resetActiveCard();
 
     STATE.score = 0;
     STATE.timeRemaining = 60;
@@ -122,7 +132,7 @@ function applyLanguage() {
         const key = el.getAttribute('data-i18n');
         if (dict[key]) el.innerText = dict[key];
     });
-    // Re-render UI components dependent on text
+    updateModeUI();
     renderBuckets();
     if(STATE.activeCard) {
         // Soft refresh active card texts safely
@@ -143,23 +153,78 @@ function applyViewMode(mode) {
     localStorage.setItem('marketDayViewMode', nextMode);
 }
 
+function selectGameMode(mode) {
+    if (!GAME_MODES[mode] || STATE.isPlaying) return;
+    STATE.mode = mode;
+    prepareRound();
+    updateModeUI();
+    renderBuckets();
+}
+
+function updateModeUI() {
+    const mode = GAME_MODES[STATE.mode];
+    if (!mode) return;
+
+    const label = i18n[currentLang][mode.labelKey];
+    els.app.dataset.mode = STATE.mode;
+    els.modeButtons.forEach((button) => {
+        const isSelected = button.dataset.mode === STATE.mode;
+        button.classList.toggle('selected', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+    });
+    if (els.ui.mode) els.ui.mode.innerText = label;
+}
+
+function prepareRound() {
+    if (STATE.mode === 'easy') {
+        STATE.activeBuckets = [...EASY_BUCKETS];
+        STATE.activeTopicIds = buckets.map((bucket) => bucket.id);
+    } else if (STATE.mode === 'medium') {
+        STATE.activeBuckets = shuffle([...buckets]).slice(0, 6);
+        STATE.activeTopicIds = STATE.activeBuckets.map((bucket) => bucket.id);
+    } else {
+        STATE.activeBuckets = [...buckets];
+        STATE.activeTopicIds = buckets.map((bucket) => bucket.id);
+    }
+    STATE.deck = getRoundCards();
+}
+
+function getRoundCards() {
+    const cards = STATE.mode === 'medium'
+        ? cardsData.filter((card) => STATE.activeTopicIds.includes(card.bucket))
+        : cardsData;
+    return shuffle(cards);
+}
+
+function getCardTargetId(cardData) {
+    if (STATE.mode !== 'easy') return cardData.bucket;
+    const group = EASY_BUCKETS.find((bucket) => bucket.topics.includes(cardData.bucket));
+    return group ? group.id : cardData.bucket;
+}
+
 // UI Renderers
 function renderBuckets() {
     els.ui.bucketsLeft.innerHTML = '';
     els.ui.bucketsRight.innerHTML = '';
 
-    buckets.forEach((b, idx) => {
+    STATE.activeBuckets.forEach((b, idx) => {
         const div = document.createElement('div');
         div.className = 'bucket';
+        div.classList.toggle('bucket-large', STATE.mode === 'easy');
         div.dataset.id = b.id;
         div.style.setProperty('--b-col', b.color);
+        const fullLabel = b[`label_${currentLang}`];
+        const displayLabel = STATE.mode === 'easy' ? fullLabel : (b[`short_${currentLang}`] || fullLabel);
+        div.setAttribute('aria-label', fullLabel);
+        div.title = fullLabel;
         div.innerHTML = `
             <div class="icon">${b.icon}</div>
-            <div class="name">${b[`label_${currentLang}`]}</div>
+            <div class="name">${displayLabel}</div>
         `;
-        // Tap fallback: user can tap a bucket to submit the current card.
         div.addEventListener('click', () => handleBucketTap(div));
-        const targetCol = idx % 2 === 0 ? els.ui.bucketsLeft : els.ui.bucketsRight;
+        const targetCol = STATE.mode === 'easy'
+            ? (idx === 0 ? els.ui.bucketsLeft : els.ui.bucketsRight)
+            : (idx % 2 === 0 ? els.ui.bucketsLeft : els.ui.bucketsRight);
         targetCol.appendChild(div);
     });
 }
@@ -180,12 +245,14 @@ function showScreen(name) {
 
 // Game Loop
 async function startGame() {
-    clearInterval(STATE.timerInterval);
-    clearInterval(STATE.spawnWatchdog);
+    const roundId = ++STATE.roundId;
+    clearRoundTimers();
+    resetActiveCard();
+    prepareRound();
+    renderBuckets();
 
     STATE.score = 0; STATE.timeRemaining = 60; STATE.combo = 0; STATE.maxCombo = 0; STATE.lives = 3;
-    STATE.totalCards = 0; STATE.correctDrops = 0; STATE.isPlaying = true;
-    STATE.deck = shuffle([...cardsData]);
+    STATE.totalCards = 0; STATE.correctDrops = 0; STATE.isPlaying = true; STATE.phase = 'countdown';
     
     updateUI();
     els.ui.dropZone.innerHTML = `
@@ -198,29 +265,45 @@ async function startGame() {
     els.ui.comboToast = document.getElementById('combo-toast');
     
     showScreen('game');
-    await playCountdown();
+    await playCountdown(roundId);
 
-    if (!STATE.isPlaying) return;
-    
+    if (!isCurrentRound(roundId) || STATE.phase !== 'countdown') return;
+    STATE.phase = 'playing';
+    startRoundLoops(roundId);
+    spawnCardFlow();
+}
+
+function isCurrentRound(roundId) {
+    return STATE.isPlaying && STATE.roundId === roundId;
+}
+
+function clearRoundTimers() {
+    clearInterval(STATE.timerInterval);
+    clearInterval(STATE.spawnWatchdog);
+    STATE.timerInterval = null;
+    STATE.spawnWatchdog = null;
+}
+
+function startRoundLoops(roundId) {
+    clearRoundTimers();
     STATE.timerInterval = setInterval(() => {
+        if (!isCurrentRound(roundId) || STATE.phase !== 'playing') return;
         STATE.timeRemaining--;
         updateUI();
-        if(STATE.timeRemaining <= 0) endGame('time');
+        if (STATE.timeRemaining <= 0) endGame('time');
     }, 1000);
 
-    // Safety net: if card flow stalls for any reason, recover automatically.
     STATE.spawnWatchdog = setInterval(() => {
-        if (!STATE.isPlaying) return;
-        if (STATE.activeCard && !document.body.contains(STATE.activeCard)) {
+        if (!isCurrentRound(roundId) || STATE.phase !== 'playing') return;
+        if (STATE.activeCard && !STATE.activeCard.isConnected) {
+            stopCardFall();
             STATE.activeCard = null;
         }
         if (!STATE.activeCard) spawnCardFlow();
     }, 700);
-
-    spawnCardFlow();
 }
 
-function playCountdown() {
+function playCountdown(roundId) {
     return new Promise((resolve) => {
         const c = els.ui.countdown;
         if (!c) {
@@ -232,7 +315,7 @@ function playCountdown() {
         let idx = 0;
 
         function tick() {
-            if (!STATE.isPlaying) {
+            if (!isCurrentRound(roundId) || STATE.phase !== 'countdown') {
                 c.classList.add('hidden');
                 resolve();
                 return;
@@ -246,7 +329,7 @@ function playCountdown() {
                 setTimeout(tick, 450);
             } else {
                 setTimeout(() => {
-                    c.classList.add('hidden');
+                    if (isCurrentRound(roundId) && STATE.phase === 'countdown') c.classList.add('hidden');
                     resolve();
                 }, 320);
             }
@@ -257,35 +340,41 @@ function playCountdown() {
 }
 
 function pauseGame() {
+    if (STATE.phase !== 'playing') return;
     STATE.isPlaying = false;
-    clearInterval(STATE.timerInterval);
-    clearInterval(STATE.spawnWatchdog);
+    STATE.phase = 'paused';
+    clearRoundTimers();
+    stopCardFall();
     showScreen('pause');
 }
 function resumeGame() {
-    STATE.isPlaying = true; showScreen('game');
-    STATE.timerInterval = setInterval(() => { STATE.timeRemaining--; updateUI(); if(STATE.timeRemaining<=0) endGame(); }, 1000);
-    STATE.spawnWatchdog = setInterval(() => {
-        if (!STATE.isPlaying) return;
-        if (STATE.activeCard && !document.body.contains(STATE.activeCard)) {
-            STATE.activeCard = null;
-        }
-        if (!STATE.activeCard) spawnCardFlow();
-    }, 700);
-    if (!STATE.activeCard) spawnCardFlow();
+    if (STATE.phase !== 'paused') return;
+    STATE.isPlaying = true;
+    STATE.phase = 'playing';
+    showScreen('game');
+    startRoundLoops(STATE.roundId);
+    if (STATE.activeCard && document.body.contains(STATE.activeCard)) {
+        startCardFall(STATE.activeCard);
+    } else {
+        STATE.activeCard = null;
+        spawnCardFlow();
+    }
 }
 function quitGame() {
     STATE.isPlaying = false;
-    clearInterval(STATE.timerInterval);
-    clearInterval(STATE.spawnWatchdog);
+    STATE.phase = 'idle';
+    STATE.roundId++;
+    clearRoundTimers();
+    resetActiveCard();
     showScreen('launch');
 }
 
 function endGame() {
     STATE.isPlaying = false;
-    clearInterval(STATE.timerInterval);
-    clearInterval(STATE.spawnWatchdog);
-    if(STATE.activeCard) { STATE.activeCard.remove(); STATE.activeCard = null; }
+    STATE.phase = 'finished';
+    STATE.roundId++;
+    clearRoundTimers();
+    resetActiveCard();
     
     const acc = STATE.totalCards > 0 ? Math.round((STATE.correctDrops / STATE.totalCards) * 100) : 0;
     document.getElementById('final-score').innerText = STATE.score;
@@ -324,9 +413,9 @@ function shuffle(arr) {
 }
 
 function spawnCardFlow() {
-    if(!STATE.isPlaying) return;
+    if (!STATE.isPlaying || STATE.phase !== 'playing') return;
     if (STATE.activeCard) return;
-    if(STATE.deck.length === 0) STATE.deck = shuffle([...cardsData]);
+    if (STATE.deck.length === 0) STATE.deck = getRoundCards();
     const data = STATE.deck.pop();
     spawnCard(data);
 }
@@ -349,25 +438,53 @@ function spawnCard(data) {
     
     els.ui.dropZone.appendChild(cardEl);
     STATE.activeCard = cardEl;
-    
-    let y = -160;
-    cardEl.style.top = y + 'px';
-    
-    let lastTime = performance.now();
-    function fall(time) {
-        if(!STATE.isPlaying || cardEl !== STATE.activeCard) return;
-        let delta = time - lastTime; lastTime = time;
-        if(!cardEl.classList.contains('dragging')) {
-            y += (STATE.fallSpeed * (delta / 16));
-            cardEl.style.top = y + 'px';
-            // Give players a grace buffer after the card reaches the floor line.
-            const missThreshold = els.ui.dropZone.clientHeight + 170;
-            if(y > missThreshold) { handleDrop(null); return; } // hit floor
-        }
-        requestAnimationFrame(fall);
-    }
-    requestAnimationFrame(fall);
+
+    cardEl.style.top = '-160px';
+    startCardFall(cardEl);
     makeDraggable(cardEl);
+}
+
+function stopCardFall() {
+    STATE.fallRun++;
+    if (STATE.fallFrame !== null) cancelAnimationFrame(STATE.fallFrame);
+    STATE.fallFrame = null;
+}
+
+function resetActiveCard() {
+    stopCardFall();
+    if (STATE.activeCard) STATE.activeCard.remove();
+    STATE.activeCard = null;
+}
+
+function startCardFall(cardEl) {
+    if (!cardEl || cardEl !== STATE.activeCard) return;
+
+    stopCardFall();
+    const fallRun = STATE.fallRun;
+    let lastTime = performance.now();
+
+    function fall(time) {
+        if (!STATE.isPlaying || cardEl !== STATE.activeCard || !cardEl.isConnected || fallRun !== STATE.fallRun) {
+            if (fallRun === STATE.fallRun) STATE.fallFrame = null;
+            return;
+        }
+
+        const delta = Math.min(64, time - lastTime);
+        lastTime = time;
+        if (!cardEl.classList.contains('dragging')) {
+            const currentY = Number.parseFloat(cardEl.style.top) || 0;
+            const nextY = currentY + (STATE.fallSpeed * (delta / 16));
+            cardEl.style.top = `${nextY}px`;
+            const missThreshold = els.ui.dropZone.clientHeight + 170;
+            if (nextY > missThreshold) {
+                handleDrop(null);
+                return;
+            }
+        }
+        STATE.fallFrame = requestAnimationFrame(fall);
+    }
+
+    STATE.fallFrame = requestAnimationFrame(fall);
 }
 
 // 3D Tilt Drag & Drop Physics
@@ -454,15 +571,18 @@ function getTargetBucket(x, y) {
 
 // Resolution & Particles
 function handleDrop(bucketEl, dropX, dropY) {
-    if(!STATE.activeCard) return;
+    if (!STATE.isPlaying || STATE.phase !== 'playing' || !STATE.activeCard) return;
     const card = STATE.activeCard;
     const sData = JSON.parse(card.dataset.source);
     document.querySelectorAll('.bucket').forEach(b => b.classList.remove('drag-over'));
     
     STATE.activeCard = null;
-    let bColor = buckets.find(b=>b.id === sData.bucket)?.color || '#fff';
+    stopCardFall();
+    const targetId = getCardTargetId(sData);
+    const targetBucket = STATE.activeBuckets.find((bucket) => bucket.id === targetId);
+    let bColor = targetBucket?.color || buckets.find(b=>b.id === sData.bucket)?.color || '#fff';
 
-    if(bucketEl && bucketEl.dataset.id === sData.bucket) {
+    if(bucketEl && bucketEl.dataset.id === targetId) {
         // CORRECT
         STATE.score += 100 + (STATE.combo * 20); STATE.correctDrops++; STATE.combo++;
         if(STATE.combo > STATE.maxCombo) STATE.maxCombo = STATE.combo;

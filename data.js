@@ -23,7 +23,14 @@ const i18n = {
         qrTitle: "Scan & Play",
         langBtn: "繁體",
         phoneView: "Phone",
-        laptopView: "Laptop"
+        laptopView: "Laptop",
+        modePrompt: "Choose a mode",
+        modeEasy: "Easy",
+        modeEasyDesc: "2 broad groups",
+        modeMedium: "Standard",
+        modeMediumDesc: "6 random topics",
+        modeFull: "Full",
+        modeFullDesc: "All 11 topics"
     },
     zh: {
         title: "SCoC 配對遊戲",
@@ -49,7 +56,14 @@ const i18n = {
         qrTitle: "掃碼挑戰",
         langBtn: "EN",
         phoneView: "手機",
-        laptopView: "桌面"
+        laptopView: "桌面",
+        modePrompt: "選擇難度",
+        modeEasy: "簡單",
+        modeEasyDesc: "2 個大分類",
+        modeMedium: "中等",
+        modeMediumDesc: "6 個隨機主題",
+        modeFull: "最終",
+        modeFullDesc: "完整 11 個主題"
     }
 };
 
@@ -103,17 +117,17 @@ const EASY_CARD_BANK = [
 ];
 
 const TOPIC_META = {
-    'Legal Compliance': { id: 'leg', label_zh: '法律合規', icon: '⚖️', color: '#ff4d4d' },
-    'Business Ethics': { id: 'eth', label_zh: '商業道德', icon: '🤝', color: '#ff9f43' },
-    'Cybersecurity': { id: 'cyb', label_zh: '網絡安全', icon: '💻', color: '#0abde3' },
-    'Quality and Safety': { id: 'qas', label_zh: '質量與安全', icon: '🛡️', color: '#10ac84' },
-    'Environmental Management': { id: 'env', label_zh: '環境管理', icon: '🌿', color: '#1dd1a1' },
-    'Climate Change': { id: 'cli', label_zh: '氣候變化', icon: '🌡️', color: '#feca57' },
-    'Employee Health and Safety': { id: 'ehs', label_zh: '員工健康與安全', icon: '👷', color: '#ff6b6b' },
-    'Labour Practices and Human Rights': { id: 'lab', label_zh: '勞工實務與人權', icon: '👥', color: '#ee5253' },
-    'Diversity and Inclusion': { id: 'div', label_zh: '多元與共融', icon: '🌈', color: '#f368e0' },
-    'Community Relations': { id: 'com', label_zh: '社區關係', icon: '🏘️', color: '#82ccdd' },
-    'Supply Chain Management': { id: 'sup', label_zh: '供應鏈管理', icon: '🔗', color: '#9b59b6' }
+    'Legal Compliance': { id: 'leg', label_zh: '法律合規', short_en: 'Legal', short_zh: '法律', icon: '01', color: '#ea6952' },
+    'Business Ethics': { id: 'eth', label_zh: '商業道德', short_en: 'Ethics', short_zh: '道德', icon: '02', color: '#e99a45' },
+    'Cybersecurity': { id: 'cyb', label_zh: '網絡安全', short_en: 'Cyber', short_zh: '網安', icon: '03', color: '#438bc7' },
+    'Quality and Safety': { id: 'qas', label_zh: '質量與安全', short_en: 'Quality', short_zh: '質安', icon: '04', color: '#3f9d82' },
+    'Environmental Management': { id: 'env', label_zh: '環境管理', short_en: 'Environment', short_zh: '環境', icon: '05', color: '#5db56e' },
+    'Climate Change': { id: 'cli', label_zh: '氣候變化', short_en: 'Climate', short_zh: '氣候', icon: '06', color: '#d5a53d' },
+    'Employee Health and Safety': { id: 'ehs', label_zh: '員工健康與安全', short_en: 'Workplace', short_zh: '職安', icon: '07', color: '#dc6a5e' },
+    'Labour Practices and Human Rights': { id: 'lab', label_zh: '勞工實務與人權', short_en: 'Labour / Rights', short_zh: '勞工人權', icon: '08', color: '#c65e67' },
+    'Diversity and Inclusion': { id: 'div', label_zh: '多元與共融', short_en: 'Inclusion', short_zh: '共融', icon: '09', color: '#a66ec4' },
+    'Community Relations': { id: 'com', label_zh: '社區關係', short_en: 'Community', short_zh: '社區', icon: '10', color: '#4f9eb3' },
+    'Supply Chain Management': { id: 'sup', label_zh: '供應鏈管理', short_en: 'Supply Chain', short_zh: '供應鏈', icon: '11', color: '#717cba' }
 };
 
 const buckets = TOPICS.map((topic) => {
@@ -122,10 +136,41 @@ const buckets = TOPICS.map((topic) => {
         id: meta.id,
         label_en: topic,
         label_zh: meta.label_zh,
+        short_en: meta.short_en,
+        short_zh: meta.short_zh,
         icon: meta.icon,
         color: meta.color
     };
 });
+
+const EASY_BUCKETS = [
+    {
+        id: 'responsible-business',
+        label_en: 'Responsible Business',
+        label_zh: '責任營運',
+        short_en: 'Business',
+        short_zh: '營運',
+        icon: 'A',
+        color: '#e96c52',
+        topics: ['leg', 'eth', 'cyb', 'qas', 'sup']
+    },
+    {
+        id: 'people-and-planet',
+        label_en: 'People & Planet',
+        label_zh: '人與環境',
+        short_en: 'People & Planet',
+        short_zh: '人與環境',
+        icon: 'B',
+        color: '#3f9d82',
+        topics: ['env', 'cli', 'ehs', 'lab', 'div', 'com']
+    }
+];
+
+const GAME_MODES = {
+    easy: { id: 'easy', labelKey: 'modeEasy', descriptionKey: 'modeEasyDesc' },
+    medium: { id: 'medium', labelKey: 'modeMedium', descriptionKey: 'modeMediumDesc' },
+    full: { id: 'full', labelKey: 'modeFull', descriptionKey: 'modeFullDesc' }
+};
 
 const cardsData = EASY_CARD_BANK.map((card) => {
     const bucketMeta = TOPIC_META[card.topic];

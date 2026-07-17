@@ -40,10 +40,30 @@
         <!-- Launch Screen -->
         <section id="launch-screen" class="screen flex-center active">
             <div class="glass-panel launch-panel">
+                <div class="launch-art" aria-hidden="true">
+                    <img src="assets/market-route.svg" alt="">
+                </div>
                 <p class="launch-kicker">CLP Supplier Code of Conduct</p>
                 <h1 data-i18n="title">SCoC 配對遊戲</h1>
                 <p class="subtitle" data-i18n="subtitle">捕捉風險，精準配對。</p>
                 <p class="launch-desc" data-i18n="launchDesc">掌握 CLP 供應商行為準則的 11 大主題！</p>
+                <div class="mode-selector">
+                    <p class="mode-prompt" data-i18n="modePrompt">選擇難度</p>
+                    <div class="mode-grid" role="group" aria-label="Game mode">
+                        <button type="button" class="mode-card selected" data-mode="easy" aria-pressed="true">
+                            <span class="mode-index">01</span>
+                            <span class="mode-copy"><strong data-i18n="modeEasy">簡單</strong><small data-i18n="modeEasyDesc">2 個大分類</small></span>
+                        </button>
+                        <button type="button" class="mode-card" data-mode="medium" aria-pressed="false">
+                            <span class="mode-index">02</span>
+                            <span class="mode-copy"><strong data-i18n="modeMedium">中等</strong><small data-i18n="modeMediumDesc">6 個隨機主題</small></span>
+                        </button>
+                        <button type="button" class="mode-card" data-mode="full" aria-pressed="false">
+                            <span class="mode-index">03</span>
+                            <span class="mode-copy"><strong data-i18n="modeFull">最終</strong><small data-i18n="modeFullDesc">完整 11 個主題</small></span>
+                        </button>
+                    </div>
+                </div>
                 <div class="launch-actions">
                     <button id="btn-start" class="btn btn-neon" data-i18n="start">開始任務</button>
                     <button id="btn-show-qr-launch" class="btn btn-outline" data-i18n="shareBtn">分享遊戲</button>
@@ -68,14 +88,14 @@
         <!-- Main Game -->
         <section id="game-ui" class="screen hidden">
             <div class="header">
-                <div class="header-title">CLP SCoC</div>
+                <div class="header-title"><span>CLP SCoC</span><span id="game-mode" class="mode-badge">簡單</span></div>
                 <div class="stats">
                     <div class="stat-box"><span data-i18n="score">分數</span><strong id="score">0</strong></div>
                     <div class="stat-box"><span data-i18n="time">時間</span><strong id="time">60</strong></div>
                     <div class="stat-box"><span data-i18n="combo">連擊</span><strong id="combo" class="text-glow">0</strong></div>
                     <div class="stat-box"><span data-i18n="lives">生命</span><strong id="lives">3</strong></div>
                 </div>
-                <button id="btn-pause" class="icon-btn">⏸️</button>
+                <button id="btn-pause" class="icon-btn" type="button" aria-label="Pause game" title="Pause game"><span aria-hidden="true">II</span></button>
             </div>
 
             <div class="time-rail">
