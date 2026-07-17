@@ -1301,6 +1301,7 @@ html[lang="en"] body.view-laptop .launch-desc {
     border-top: 5px solid var(--card-color);
     border-radius: 8px;
     box-shadow: 0 16px 28px rgba(6, 28, 24, 0.28);
+    transform: translateX(-50%);
 }
 
 .risk-card.dragging {
@@ -1689,5 +1690,303 @@ html[lang="en"] body.view-laptop .launch-desc {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+#tutorial-screen {
+    padding: 18px;
+    background:
+        linear-gradient(145deg, rgba(13, 61, 54, 0.88), rgba(17, 85, 76, 0.82)),
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 22px);
+}
+
+.tutorial-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.92fr);
+    width: min(100%, 680px);
+    max-height: calc(100dvh - 52px);
+    overflow: hidden;
+    color: #173a35;
+    background: #fffefd;
+    border: 1px solid rgba(255, 255, 255, 0.64);
+    border-radius: 8px;
+    box-shadow: 0 26px 60px rgba(5, 37, 31, 0.32);
+}
+
+.tutorial-art {
+    display: grid;
+    min-height: 360px;
+    place-items: center;
+    overflow: hidden;
+    background: #dff1e9;
+    border-right: 6px solid #e96c52;
+}
+
+.tutorial-art img {
+    display: block;
+    width: 112%;
+    max-width: none;
+    height: auto;
+    animation: tutorialArtFloat 5s ease-in-out infinite;
+}
+
+.tutorial-copy {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    padding: 28px;
+}
+
+.tutorial-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.tutorial-kicker {
+    margin: 0;
+    color: #1d5b51;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.tutorial-progress {
+    margin: 0;
+    padding: 4px 8px;
+    color: #fff;
+    background: #1d5b51;
+    border-radius: 5px;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.tutorial-steps {
+    flex: 1;
+    min-height: 172px;
+}
+
+.tutorial-step {
+    display: none;
+}
+
+.tutorial-step.active {
+    display: block;
+    animation: tutorialStepIn 0.34s ease-out both;
+}
+
+.tutorial-step-number {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    margin-bottom: 16px;
+    color: #fff;
+    background: #e96c52;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+.tutorial-step h2 {
+    margin: 0 0 10px;
+    color: #173a35;
+    font-family: var(--font-display);
+    font-size: clamp(1.42rem, 3.2vw, 1.82rem);
+    line-height: 1.2;
+    letter-spacing: 0;
+}
+
+.tutorial-step p {
+    margin: 0;
+    color: #4b6760;
+    font-size: 0.93rem;
+    font-weight: 650;
+    line-height: 1.72;
+}
+
+.tutorial-footer {
+    margin-top: auto;
+}
+
+.tutorial-dots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.tutorial-dot {
+    width: 20px;
+    height: 4px;
+    background: #c6dbd1;
+    border-radius: 2px;
+    transition: width 0.2s ease, background 0.2s ease;
+}
+
+.tutorial-dot.active {
+    width: 36px;
+    background: #e96c52;
+}
+
+.tutorial-actions {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 8px;
+}
+
+.tutorial-actions .btn {
+    width: 100%;
+}
+
+.tutorial-back-btn {
+    display: grid;
+    width: 42px;
+    height: 48px;
+    place-items: center;
+    color: #1d5b51;
+    background: #e8f3ed;
+    border: 1px solid rgba(29, 91, 81, 0.16);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.22rem;
+    font-weight: 900;
+}
+
+.tutorial-back-btn[hidden] {
+    display: none;
+}
+
+.tutorial-actions.is-first-step {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.playfield {
+    isolation: isolate;
+}
+
+.drop-zone {
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(155deg, #24675b 0%, #18453d 58%, #153c36 100%);
+    background-size: 28px 28px, 28px 28px, auto;
+}
+
+.drop-zone::before {
+    position: absolute;
+    right: -14%;
+    bottom: -1%;
+    z-index: 0;
+    width: min(88%, 530px);
+    height: min(44%, 310px);
+    content: "";
+    pointer-events: none;
+    background: url("assets/clp-energy-crew.svg") right bottom / contain no-repeat;
+    opacity: 0.13;
+}
+
+.app-container[data-mode="easy"] {
+    --easy-rail-width: clamp(58px, calc((100% - var(--card-width) - 34px) / 2), 136px);
+}
+
+.app-container[data-mode="easy"] .buckets-side {
+    width: var(--easy-rail-width);
+}
+
+.app-container[data-mode="easy"] .risk-card {
+    width: min(var(--card-width), calc(100% - var(--easy-rail-width) - var(--easy-rail-width) - 30px));
+}
+
+.risk-card {
+    z-index: 50;
+}
+
+@keyframes tutorialStepIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tutorialArtFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
+
+@media (max-width: 620px) {
+    .tutorial-panel {
+        grid-template-columns: minmax(0, 1fr);
+        width: min(100%, 430px);
+    }
+
+    .tutorial-art {
+        min-height: 172px;
+        max-height: 205px;
+        border-right: 0;
+        border-bottom: 5px solid #e96c52;
+    }
+
+    .tutorial-art img {
+        width: min(100%, 390px);
+    }
+
+    .tutorial-copy {
+        padding: 19px 20px 20px;
+    }
+
+    .tutorial-meta {
+        margin-bottom: 16px;
+    }
+
+    .tutorial-steps {
+        min-height: 150px;
+    }
+}
+
+@media (max-height: 700px) {
+    .tutorial-panel {
+        max-height: calc(100dvh - 30px);
+    }
+
+    .tutorial-art {
+        min-height: 116px;
+        max-height: 136px;
+    }
+
+    .tutorial-copy {
+        padding: 15px 20px 17px;
+    }
+
+    .tutorial-meta {
+        margin-bottom: 10px;
+    }
+
+    .tutorial-step-number {
+        width: 30px;
+        height: 30px;
+        margin-bottom: 8px;
+        font-size: 0.68rem;
+    }
+
+    .tutorial-step h2 {
+        margin-bottom: 6px;
+        font-size: 1.3rem;
+    }
+
+    .tutorial-step p {
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+    .tutorial-steps {
+        min-height: 122px;
+    }
+
+    .tutorial-dots {
+        margin-bottom: 8px;
     }
 }

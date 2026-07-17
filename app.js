@@ -20,6 +20,7 @@ const STATE = {
     activeTopicIds: [],
     phase: 'idle',
     roundId: 0,
+    tutorialStep: 0,
     deck: [],
     fallSpeed: 1.05 // Extra slow descent for more answer time
 };
@@ -30,6 +31,7 @@ const els = {
     modeButtons: document.querySelectorAll('.mode-card'),
     screens: {
         launch: document.getElementById('launch-screen'),
+        tutorial: document.getElementById('tutorial-screen'),
         precheck: document.getElementById('precheck-overlay'),
         game: document.getElementById('game-ui'),
         pause: document.getElementById('pause-overlay'),
@@ -71,13 +73,15 @@ function bindEvents() {
     els.modeButtons.forEach((button) => {
         button.addEventListener('click', () => selectGameMode(button.dataset.mode));
     });
-    document.getElementById('btn-start').addEventListener('click', openPrecheck);
+    document.getElementById('btn-start').addEventListener('click', openTutorial);
+    document.getElementById('btn-tutorial-back').addEventListener('click', () => changeTutorialStep(-1));
+    document.getElementById('btn-tutorial-next').addEventListener('click', advanceTutorial);
     document.getElementById('btn-scoc-yes').addEventListener('click', startGame);
     document.getElementById('btn-scoc-no').addEventListener('click', rejectScoc);
     document.getElementById('btn-pause').addEventListener('click', pauseGame);
     document.getElementById('btn-resume').addEventListener('click', resumeGame);
     document.getElementById('btn-quit').addEventListener('click', quitGame);
-    document.getElementById('btn-play-again').addEventListener('click', openPrecheck);
+    document.getElementById('btn-play-again').addEventListener('click', openTutorial);
     
     document.getElementById('btn-show-qr-launch').addEventListener('click', showQR);
     document.getElementById('btn-show-qr-settlement').addEventListener('click', showQR);
@@ -91,6 +95,57 @@ function bindEvents() {
 
 function openPrecheck() {
     showScreen('precheck');
+}
+
+function openTutorial() {
+    STATE.tutorialStep = 0;
+    renderTutorial();
+    showScreen('tutorial');
+}
+
+function changeTutorialStep(change) {
+    const steps = document.querySelectorAll('.tutorial-step');
+    const lastStep = steps.length - 1;
+    STATE.tutorialStep = Math.max(0, Math.min(lastStep, STATE.tutorialStep + change));
+    renderTutorial();
+}
+
+function advanceTutorial() {
+    const steps = document.querySelectorAll('.tutorial-step');
+    if (STATE.tutorialStep >= steps.length - 1) {
+        openPrecheck();
+        return;
+    }
+    changeTutorialStep(1);
+}
+
+function renderTutorial() {
+    const steps = document.querySelectorAll('.tutorial-step');
+    if (!steps.length) return;
+
+    const lastStep = steps.length - 1;
+    STATE.tutorialStep = Math.max(0, Math.min(lastStep, STATE.tutorialStep));
+    steps.forEach((step, index) => {
+        const isActive = index === STATE.tutorialStep;
+        step.classList.toggle('active', isActive);
+        step.setAttribute('aria-hidden', String(!isActive));
+    });
+
+    document.querySelectorAll('.tutorial-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === STATE.tutorialStep);
+    });
+
+    const previous = document.getElementById('btn-tutorial-back');
+    const next = document.getElementById('btn-tutorial-next');
+    const progress = document.getElementById('tutorial-progress');
+    const actions = document.querySelector('.tutorial-actions');
+    const dict = i18n[currentLang];
+    previous.hidden = STATE.tutorialStep === 0;
+    actions.classList.toggle('is-first-step', STATE.tutorialStep === 0);
+    previous.title = dict.tutorialPrevious;
+    previous.setAttribute('aria-label', dict.tutorialPrevious);
+    next.innerText = STATE.tutorialStep === lastStep ? dict.tutorialStartDeclaration : dict.tutorialNext;
+    progress.innerText = `${STATE.tutorialStep + 1} / ${steps.length}`;
 }
 
 function rejectScoc() {
@@ -133,6 +188,7 @@ function applyLanguage() {
         if (dict[key]) el.innerText = dict[key];
     });
     updateModeUI();
+    renderTutorial();
     renderBuckets();
     if(STATE.activeCard) {
         // Soft refresh active card texts safely
