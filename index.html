@@ -64,6 +64,19 @@
                         </button>
                     </div>
                 </div>
+                <div class="duration-selector">
+                    <p class="duration-prompt" data-i18n="durationPrompt">每輪時長</p>
+                    <div class="duration-grid" role="group" aria-label="Round duration">
+                        <button type="button" class="duration-card selected" data-duration="60" aria-pressed="true">
+                            <span class="duration-value">1</span>
+                            <span class="duration-copy"><strong data-i18n="durationOne">1 分鐘</strong><small data-i18n="durationOneHint">快速挑戰</small></span>
+                        </button>
+                        <button type="button" class="duration-card" data-duration="120" aria-pressed="false">
+                            <span class="duration-value">2</span>
+                            <span class="duration-copy"><strong data-i18n="durationTwo">2 分鐘</strong><small data-i18n="durationTwoHint">從容配對</small></span>
+                        </button>
+                    </div>
+                </div>
                 <div class="launch-actions">
                     <button id="btn-start" class="btn btn-neon" data-i18n="start">開始任務</button>
                     <button id="btn-show-qr-launch" class="btn btn-outline" data-i18n="shareBtn">分享遊戲</button>
@@ -96,7 +109,10 @@
                 <div id="topic-guide-list" class="topic-guide-list" role="list"></div>
             </div>
             <footer class="topic-guide-footer">
-                <p data-i18n="topicGuideReady">已了解全部 11 個主題？</p>
+                <div class="topic-guide-footer-copy">
+                    <p data-i18n="topicGuideReady">已了解全部 11 個主題？</p>
+                    <p class="selected-duration"><span data-i18n="selectedDurationLabel">本輪時長</span><strong id="tutorial-duration">1 分鐘</strong></p>
+                </div>
                 <button id="btn-tutorial-continue" class="btn btn-neon" type="button" data-i18n="topicGuideContinue">前往供應商聲明</button>
             </footer>
         </section>
@@ -108,6 +124,7 @@
                 <div class="tut-icon">📋</div>
                 <p class="precheck-desc" data-i18n="precheckDesc">假設你是一名供應商，你是否願意遵守 CLP 供應商行為守則（SCoC）？</p>
                 <p class="precheck-note" data-i18n="precheckNote">選擇「願意」即可開始遊戲；選擇「不願意」會直接失敗。</p>
+                <p class="precheck-duration"><span data-i18n="selectedDurationLabel">本輪時長</span><strong id="precheck-duration">1 分鐘</strong></p>
                 <div class="choice-actions mt-4">
                     <button id="btn-scoc-yes" class="btn btn-neon" data-i18n="precheckYes">願意遵守</button>
                     <button id="btn-scoc-no" class="btn btn-outline" data-i18n="precheckNo">不願意遵守</button>
@@ -121,7 +138,7 @@
                 <div class="header-title"><span>CLP SCoC</span><span id="game-mode" class="mode-badge">簡單</span></div>
                 <div class="stats">
                     <div class="stat-box"><span data-i18n="score">分數</span><strong id="score">0</strong></div>
-                    <div class="stat-box"><span data-i18n="time">時間</span><strong id="time">60</strong></div>
+                    <div class="stat-box"><span data-i18n="time">時間</span><strong id="time">1:00</strong></div>
                     <div class="stat-box"><span data-i18n="combo">連擊</span><strong id="combo" class="text-glow">0</strong></div>
                     <div class="stat-box"><span data-i18n="lives">生命</span><strong id="lives">3</strong></div>
                 </div>

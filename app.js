@@ -3,6 +3,7 @@ let currentLang = 'zh'; // Default Chinese as requested
 
 const STATE = {
     timeRemaining: 60,
+    roundDuration: 60,
     score: 0,
     lives: 3,
     totalCards: 0,
@@ -28,6 +29,7 @@ const els = {
     app: document.getElementById('app'),
     viewButtons: document.querySelectorAll('.view-btn'),
     modeButtons: document.querySelectorAll('.mode-card'),
+    durationButtons: document.querySelectorAll('.duration-card'),
     screens: {
         launch: document.getElementById('launch-screen'),
         tutorial: document.getElementById('tutorial-screen'),
@@ -56,9 +58,14 @@ const els = {
 
 // Initial Setup
 function init() {
+    const savedDuration = Number(localStorage.getItem('marketDayRoundDuration'));
+    if ([60, 120].includes(savedDuration)) STATE.roundDuration = savedDuration;
+    STATE.timeRemaining = STATE.roundDuration;
     prepareRound();
     applyLanguage();
     applyViewMode(localStorage.getItem('marketDayViewMode') || 'phone');
+    updateRoundDurationUI();
+    updateUI();
     renderBuckets();
     bindEvents();
     setupQRLink();
@@ -71,6 +78,9 @@ function bindEvents() {
     });
     els.modeButtons.forEach((button) => {
         button.addEventListener('click', () => selectGameMode(button.dataset.mode));
+    });
+    els.durationButtons.forEach((button) => {
+        button.addEventListener('click', () => selectRoundDuration(button.dataset.duration));
     });
     document.getElementById('btn-start').addEventListener('click', openTutorial);
     document.getElementById('btn-close-tutorial').addEventListener('click', () => showScreen('launch'));
@@ -98,6 +108,7 @@ function openPrecheck() {
 
 function openTutorial() {
     renderTopicGuide();
+    updateRoundDurationUI();
     const guideScroll = document.getElementById('topic-guide-scroll');
     if (guideScroll) guideScroll.scrollTop = 0;
     showScreen('tutorial');
@@ -169,7 +180,7 @@ function rejectScoc() {
     resetActiveCard();
 
     STATE.score = 0;
-    STATE.timeRemaining = 60;
+    STATE.timeRemaining = STATE.roundDuration;
     STATE.combo = 0;
     STATE.maxCombo = 0;
     STATE.lives = 0;
@@ -201,6 +212,7 @@ function applyLanguage() {
         if (dict[key]) el.innerText = dict[key];
     });
     updateModeUI();
+    updateRoundDurationUI();
     renderTopicGuide();
     renderBuckets();
     if(STATE.activeCard) {
@@ -228,6 +240,44 @@ function selectGameMode(mode) {
     prepareRound();
     updateModeUI();
     renderBuckets();
+}
+
+function selectRoundDuration(duration) {
+    const nextDuration = Number(duration);
+    if (STATE.isPlaying || ![60, 120].includes(nextDuration)) return;
+
+    STATE.roundDuration = nextDuration;
+    STATE.timeRemaining = nextDuration;
+    localStorage.setItem('marketDayRoundDuration', String(nextDuration));
+    updateRoundDurationUI();
+    updateUI();
+}
+
+function getRoundDurationLabel() {
+    return STATE.roundDuration === 120
+        ? i18n[currentLang].durationTwo
+        : i18n[currentLang].durationOne;
+}
+
+function formatTime(seconds) {
+    const safeSeconds = Math.max(0, seconds);
+    const minutes = Math.floor(safeSeconds / 60);
+    const remainder = String(safeSeconds % 60).padStart(2, '0');
+    return `${minutes}:${remainder}`;
+}
+
+function updateRoundDurationUI() {
+    const durationLabel = getRoundDurationLabel();
+    els.durationButtons.forEach((button) => {
+        const isSelected = Number(button.dataset.duration) === STATE.roundDuration;
+        button.classList.toggle('selected', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+    });
+
+    ['tutorial-duration', 'precheck-duration'].forEach((id) => {
+        const durationEl = document.getElementById(id);
+        if (durationEl) durationEl.innerText = durationLabel;
+    });
 }
 
 function updateModeUI() {
@@ -320,7 +370,7 @@ async function startGame() {
     prepareRound();
     renderBuckets();
 
-    STATE.score = 0; STATE.timeRemaining = 60; STATE.combo = 0; STATE.maxCombo = 0; STATE.lives = 3;
+    STATE.score = 0; STATE.timeRemaining = STATE.roundDuration; STATE.combo = 0; STATE.maxCombo = 0; STATE.lives = 3;
     STATE.totalCards = 0; STATE.correctDrops = 0; STATE.isPlaying = true; STATE.phase = 'countdown';
     
     updateUI();
@@ -465,11 +515,11 @@ function endGame() {
 
 function updateUI() {
     els.ui.score.innerText = STATE.score;
-    els.ui.time.innerText = STATE.timeRemaining;
+    els.ui.time.innerText = formatTime(STATE.timeRemaining);
     els.ui.combo.innerText = STATE.combo;
     els.ui.lives.innerText = '❤'.repeat(Math.max(0, STATE.lives));
     if (els.ui.timeFill) {
-        const pct = Math.max(0, Math.min(100, (STATE.timeRemaining / 60) * 100));
+        const pct = Math.max(0, Math.min(100, (STATE.timeRemaining / STATE.roundDuration) * 100));
         els.ui.timeFill.style.width = pct + '%';
     }
 }

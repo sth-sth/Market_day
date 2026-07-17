@@ -39,7 +39,13 @@ const i18n = {
         modeMedium: "Standard",
         modeMediumDesc: "6 random topics",
         modeFull: "Full",
-        modeFullDesc: "All 11 topics"
+        modeFullDesc: "All 11 topics",
+        durationPrompt: "Round duration",
+        durationOne: "1 min",
+        durationOneHint: "Focused round",
+        durationTwo: "2 min",
+        durationTwoHint: "More time",
+        selectedDurationLabel: "Round duration"
     },
     zh: {
         title: "SCoC 配對遊戲",
@@ -81,7 +87,13 @@ const i18n = {
         modeMedium: "中等",
         modeMediumDesc: "6 個隨機主題",
         modeFull: "最終",
-        modeFullDesc: "完整 11 個主題"
+        modeFullDesc: "完整 11 個主題",
+        durationPrompt: "每輪時長",
+        durationOne: "1 分鐘",
+        durationOneHint: "快速挑戰",
+        durationTwo: "2 分鐘",
+        durationTwoHint: "從容配對",
+        selectedDurationLabel: "本輪時長"
     }
 };
 
