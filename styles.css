@@ -209,7 +209,7 @@ body.view-laptop .laptop-hardware {
     flex: 1;
     overflow: hidden;
     border-radius: calc(var(--frame-radius) - 10px);
-    background: #08131d var(--bg-image) center center / cover no-repeat;
+    background-color: #08131d; background-image: var(--bg-image, url('assets/clp-scoc-bg-landscape.png')); background-size: cover; background-position: center center; background-repeat: no-repeat;
 }
 
 .app-container {
