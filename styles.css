@@ -2194,3 +2194,392 @@ html[lang="en"] body.view-laptop .launch-desc {
         min-width: 0;
     }
 }
+
+/* ========================================
+   手機首屏優化 & 自定義背景圖片
+   Mobile First-Screen Fit & Custom Background
+   ======================================== */
+
+/* --- 手機首屏完整顯示優化 --- */
+/* 確保 body 在手機上不產生額外 padding 佔用空間 */
+@media (max-width: 480px) {
+    body {
+        padding: 58px 8px 8px;
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+        overflow: hidden;
+    }
+
+    .top-controls {
+        top: 6px;
+        height: 44px;
+    }
+
+    .experience-shell {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* 手機 view 設備高度填滿可用空間 */
+    body.view-phone {
+        --device-height: calc(100dvh - 70px);
+        --frame-radius: 28px;
+        --frame-padding: 6px;
+    }
+
+    .device-frame {
+        height: var(--device-height);
+        max-height: var(--device-height);
+    }
+
+    /* Launch 頁面在小螢幕上壓縮間距 */
+    .launch-panel,
+    body.view-laptop .launch-panel {
+        padding: 12px 12px;
+    }
+
+    .launch-art {
+        width: 180px;
+        margin-bottom: 6px;
+    }
+
+    #launch-screen h1,
+    body.view-laptop #launch-screen h1 {
+        font-size: 1.75rem;
+        margin-bottom: 4px;
+    }
+
+    .launch-kicker {
+        margin-bottom: 6px;
+        font-size: 0.58rem;
+    }
+
+    .subtitle {
+        font-size: 0.88rem;
+        margin-bottom: 4px;
+    }
+
+    .launch-desc {
+        font-size: 0.78rem;
+        margin-bottom: 8px;
+    }
+
+    .mode-selector {
+        margin-bottom: 8px;
+    }
+
+    .mode-card {
+        min-height: 54px;
+        padding: 5px 4px;
+    }
+
+    .duration-selector {
+        margin-bottom: 8px;
+    }
+
+    .duration-card {
+        min-height: 46px;
+        padding: 5px 7px;
+    }
+
+    .launch-actions {
+        gap: 6px;
+        max-width: 100%;
+    }
+
+    .btn {
+        min-height: 42px;
+        padding: 10px 16px;
+        font-size: 0.88rem;
+    }
+}
+
+/* 極小螢幕 (375px 以下) 進一步壓縮 */
+@media (max-width: 375px) {
+    body {
+        padding: 54px 6px 6px;
+    }
+
+    body.view-phone {
+        --device-height: calc(100dvh - 62px);
+    }
+
+    .launch-art {
+        width: 150px;
+        margin-bottom: 4px;
+    }
+
+    #launch-screen h1,
+    body.view-laptop #launch-screen h1 {
+        font-size: 1.55rem;
+    }
+
+    .mode-grid {
+        gap: 4px;
+    }
+
+    .mode-card {
+        min-height: 48px;
+    }
+
+    .duration-card {
+        min-height: 42px;
+    }
+
+    .btn {
+        min-height: 38px;
+        padding: 8px 12px;
+    }
+}
+
+/* --- 自定義背景圖片支援 --- */
+/*
+  用法：
+  在 <body> 加上 style="--bg-image: url('你的圖片路徑');" 即可。
+  例如：<body class="view-phone has-bg-image" style="--bg-image: url('assets/my-bg.jpg');">
+  或透過下方的背景設定按鈕 UI 由 JavaScript 動態設置。
+*/
+
+/* 自定義背景圖片變數預設值 */
+:root {
+    --bg-image: none;
+    --bg-overlay-opacity: 0.45;
+}
+
+/* 當啟用自定義背景時套用 */
+body.has-bg-image {
+    background-image: var(--bg-image) !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+
+/* 背景圖片上方加半透明遮罩，保持文字可讀性 */
+body.has-bg-image::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: rgba(15, 48, 42, var(--bg-overlay-opacity));
+    z-index: 0;
+}
+
+/* 確保原有的 CSS 漸層在有背景圖片時隱藏 */
+body.has-bg-image::before {
+    display: none;
+}
+
+/* --- 背景設定浮動按鈕 UI --- */
+.bg-setting-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 300;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(29, 91, 81, 0.32);
+    background: rgba(251, 254, 253, 0.92);
+    color: #1d5b51;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(22, 62, 54, 0.2);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    touch-action: manipulation;
+}
+
+.bg-setting-btn:active {
+    transform: scale(0.9);
+}
+
+/* 背景設定抽屜面板 */
+.bg-setting-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 400;
+    padding: 20px 20px 32px;
+    background: #fbfefd;
+    border-radius: 20px 20px 0 0;
+    border-top: 1px solid rgba(29, 91, 81, 0.16);
+    box-shadow: 0 -12px 36px rgba(22, 62, 54, 0.18);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.bg-setting-panel.open {
+    transform: translateY(0);
+}
+
+.bg-setting-panel h3 {
+    margin: 0 0 14px;
+    color: #173a35;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.bg-setting-panel-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.bg-setting-panel-row label {
+    flex: 0 0 auto;
+    color: #315a52;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 56px;
+}
+
+.bg-file-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid rgba(29, 91, 81, 0.22);
+    border-radius: 8px;
+    background: #f0f7f3;
+    color: #173a35;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.bg-url-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid rgba(29, 91, 81, 0.22);
+    border-radius: 8px;
+    background: #f0f7f3;
+    color: #173a35;
+    font-size: 0.82rem;
+    outline: none;
+}
+
+.bg-url-input:focus {
+    border-color: #1d5b51;
+    box-shadow: 0 0 0 2px rgba(29, 91, 81, 0.14);
+}
+
+.bg-overlay-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.bg-overlay-row label {
+    color: #315a52;
+    font-size: 0.82rem;
+    font-weight: 700;
+    flex: 0 0 auto;
+    min-width: 56px;
+}
+
+.bg-overlay-slider {
+    flex: 1;
+    accent-color: #1d5b51;
+}
+
+.bg-overlay-value {
+    color: #1d5b51;
+    font-size: 0.8rem;
+    font-weight: 800;
+    min-width: 32px;
+    text-align: right;
+}
+
+.bg-setting-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.bg-setting-actions button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(29, 91, 81, 0.22);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.bg-btn-apply {
+    background: #1d5b51;
+    color: #fff;
+    border-color: #1d5b51 !important;
+}
+
+.bg-btn-clear {
+    background: rgba(255,255,255,0.72);
+    color: #1d5b51;
+}
+
+.bg-setting-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 350;
+    background: rgba(15, 48, 42, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.bg-setting-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* 預覽縮圖列 */
+.bg-preview-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 14px;
+    scrollbar-width: none;
+}
+
+.bg-preview-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.bg-preset-thumb {
+    flex: 0 0 64px;
+    height: 52px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    transition: border-color 0.18s ease, transform 0.18s ease;
+    touch-action: manipulation;
+}
+
+.bg-preset-thumb.active,
+.bg-preset-thumb:hover {
+    border-color: #1d5b51;
+    transform: scale(1.06);
+}
+
+/* 「無背景」預設縮圖 */
+.bg-preset-thumb.no-bg {
+    background: linear-gradient(135deg, #e7f3ec, #f5f8f2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #527068;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.2;
+}
