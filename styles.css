@@ -68,7 +68,7 @@ body.view-phone {
 }
 
 body.view-laptop {
-    --device-width: min(1180px, 100%);
+    --device-width: min(900px, 100%);
     --device-height: min(820px, calc(100dvh - 92px));
     --frame-radius: 30px;
     --frame-padding: 12px;
@@ -2351,7 +2351,7 @@ html[lang="en"] body.view-laptop .launch-desc {
 /* 當啟用自定義背景時套用 */
 body.has-bg-image {
     background-image: var(--bg-image) !important;
-    background-color: #87CEEB !important;   background-size: auto 85% !important;
+    background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     background-attachment: fixed !important;
