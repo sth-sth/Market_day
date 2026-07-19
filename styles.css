@@ -209,7 +209,7 @@ body.view-laptop .laptop-hardware {
     flex: 1;
     overflow: hidden;
     border-radius: calc(var(--frame-radius) - 10px);
-    background: #08131d;
+    background: #08131d url('assets/clp-scoc-bg-landscape.png') center center / cover no-repeat;
 }
 
 .app-container {
@@ -2350,7 +2350,7 @@ html[lang="en"] body.view-laptop .launch-desc {
 
 /* 當啟用自定義背景時套用 */
 body.has-bg-image {
-    background-image: var(--bg-image) !important;
+    background-image: none !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
