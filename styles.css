@@ -68,8 +68,8 @@ body.view-phone {
 }
 
 body.view-laptop {
-    --device-width: min(860px, 100%);
-    --device-height: min(680px, calc(100dvh - 92px));
+    --device-width: min(1180px, 100%);
+    --device-height: min(820px, calc(100dvh - 92px));
     --frame-radius: 30px;
     --frame-padding: 12px;
     --frame-gap: 8px;
@@ -679,7 +679,7 @@ html[lang="en"] .precheck-panel {
 }
 
 body.view-laptop .launch-panel {
-    width: min(100%, 680px);
+    width: min(100%, 820px);
     max-width: 560px;
 }
 
@@ -689,7 +689,7 @@ body.view-laptop .precheck-panel {
 }
 
 body.view-laptop .launch-panel {
-    max-width: 680px;
+    max-width: 820px;
 }
 
 html[lang="en"] body.view-laptop .launch-panel {
@@ -840,7 +840,7 @@ body.view-laptop .bucket .name {
     }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1180px) {
     body.view-laptop {
         --device-width: calc(100vw - 20px);
         --device-height: calc(100dvh - 78px);
