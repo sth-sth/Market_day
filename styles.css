@@ -2344,7 +2344,7 @@ html[lang="en"] body.view-laptop .launch-desc {
 
 /* 自定義背景圖片變數預設值 */
 :root {
-    --bg-image: none;
+    --bg-image: url('assets/clp-scoc-bg-landscape.png');
     --bg-overlay-opacity: 0.45;
 }
 
