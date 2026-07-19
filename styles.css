@@ -938,7 +938,7 @@ body.view-laptop {
 }
 
 .device-content {
-    background: transparent;
+    background: #08131d var(--bg-image, url('assets/clp-scoc-bg-landscape.png')) center center / cover no-repeat;
 }
 
 .phone-speaker {
