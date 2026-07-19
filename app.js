@@ -232,6 +232,14 @@ function applyViewMode(mode) {
         button.classList.toggle('active', button.dataset.view === nextMode);
     });
     localStorage.setItem('marketDayViewMode', nextMode);
+    // 如果沒有自訂背景，切換視圖時更新預設背景
+    if (!localStorage.getItem('marketday_bg_url')) {
+        const defaultBg = nextMode === 'laptop' ? 'assets/bg-desktop.jpg' : 'assets/bg-mobile.jpg';
+        const opacity = parseFloat(localStorage.getItem('marketday_bg_opacity') || '0.45');
+        document.body.style.setProperty('--bg-image', `url('${defaultBg}')`);
+        document.body.style.setProperty('--bg-overlay-opacity', opacity);
+        document.body.classList.add('has-bg-image');
+    }
 }
 
 function selectGameMode(mode) {
@@ -865,6 +873,11 @@ window.addEventListener('DOMContentLoaded', init);
 
     if (savedBg) {
         applyBackground(savedBg, savedOpacity);
+    } else {
+        // 無自訂背景時，根據視圖模式載入預設背景圖片
+        const viewMode = localStorage.getItem('marketDayViewMode') || 'phone';
+        const defaultBg = viewMode === 'laptop' ? 'assets/bg-desktop.jpg' : 'assets/bg-mobile.jpg';
+        applyBackground(defaultBg, savedOpacity);
     }
 
     if (overlaySlider) {
