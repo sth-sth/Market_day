@@ -2351,7 +2351,7 @@ html[lang="en"] body.view-laptop .launch-desc {
 /* 當啟用自定義背景時套用 */
 body.has-bg-image {
     background-image: var(--bg-image) !important;
-    background-size: cover !important;
+    background-color: #87CEEB !important;   background-size: auto 85% !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     background-attachment: fixed !important;
