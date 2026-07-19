@@ -839,3 +839,200 @@ function showQR() {
 function hideQR() { els.qrModal.classList.add('hidden'); }
 
 window.addEventListener('DOMContentLoaded', init);
+
+// ============================================
+// 背景設定功能 (Background Setting Feature)
+// ============================================
+(function initBgSetting() {
+    const body = document.body;
+    const btnOpen = document.getElementById('btn-bg-setting');
+    const panel = document.getElementById('bg-setting-panel');
+    const overlay = document.getElementById('bg-setting-overlay');
+    const fileInput = document.getElementById('bg-file-input');
+    const urlInput = document.getElementById('bg-url-input');
+    const overlaySlider = document.getElementById('bg-overlay-slider');
+    const overlayValue = document.getElementById('bg-overlay-value');
+    const btnApply = document.getElementById('bg-btn-apply');
+    const btnClear = document.getElementById('bg-btn-clear');
+    const presetStrip = document.getElementById('bg-preset-strip');
+
+    if (!btnOpen || !panel) return;
+
+    // 從 localStorage 恢復上次的背景設定
+    let pendingBgUrl = null;
+    const savedBg = localStorage.getItem('marketday_bg_url');
+    const savedOpacity = parseFloat(localStorage.getItem('marketday_bg_opacity') || '0.45');
+
+    if (savedBg) {
+        applyBackground(savedBg, savedOpacity);
+    }
+
+    if (overlaySlider) {
+        overlaySlider.value = savedOpacity;
+        updateOverlayValueLabel(savedOpacity);
+    }
+
+    // 開關面板
+    function openPanel() {
+        panel.classList.add('open');
+        overlay.classList.add('visible');
+    }
+
+    function closePanel() {
+        panel.classList.remove('open');
+        overlay.classList.remove('visible');
+        pendingBgUrl = null;
+        if (fileInput) fileInput.value = '';
+    }
+
+    btnOpen.addEventListener('click', openPanel);
+    overlay.addEventListener('click', closePanel);
+
+    // 遠明度滑桿事件
+    function updateOverlayValueLabel(val) {
+        if (overlayValue) overlayValue.textContent = Math.round(val * 100) + '%';
+    }
+
+    if (overlaySlider) {
+        overlaySlider.addEventListener('input', function () {
+            updateOverlayValueLabel(parseFloat(this.value));
+            // 即時預覽
+            if (body.classList.contains('has-bg-image')) {
+                body.style.setProperty('--bg-overlay-opacity', this.value);
+            }
+        });
+    }
+
+    // 選擇本地圖片
+    if (fileInput) {
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                pendingBgUrl = e.target.result;
+                // 將圖片加入縮圖列
+                addToPresetStrip(pendingBgUrl, true);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // 套用按鈕
+    if (btnApply) {
+        btnApply.addEventListener('click', function () {
+            const urlVal = urlInput ? urlInput.value.trim() : '';
+            const bgUrl = pendingBgUrl || (urlVal ? urlVal : null);
+            const opacityVal = overlaySlider ? parseFloat(overlaySlider.value) : 0.45;
+
+            if (bgUrl) {
+                applyBackground(bgUrl, opacityVal);
+                localStorage.setItem('marketday_bg_url', bgUrl);
+                localStorage.setItem('marketday_bg_opacity', opacityVal);
+            } else {
+                // 如果沒有輸入但頂部資料更改恰更新遠明度
+                const currentBg = localStorage.getItem('marketday_bg_url');
+                if (currentBg) {
+                    applyBackground(currentBg, opacityVal);
+                    localStorage.setItem('marketday_bg_opacity', opacityVal);
+                }
+            }
+            closePanel();
+        });
+    }
+
+    // 清除按鈕
+    if (btnClear) {
+        btnClear.addEventListener('click', function () {
+            clearBackground();
+            localStorage.removeItem('marketday_bg_url');
+            localStorage.removeItem('marketday_bg_opacity');
+            closePanel();
+        });
+    }
+
+    // URL 輸入
+    if (urlInput) {
+        urlInput.addEventListener('input', function () {
+            if (this.value.trim()) {
+                pendingBgUrl = null; // 優先使用 URL
+            }
+        });
+    }
+
+    // 套用背景
+    function applyBackground(bgUrl, opacity) {
+        body.style.setProperty('--bg-image', `url('${bgUrl}')`);
+        body.style.setProperty('--bg-overlay-opacity', opacity);
+        body.classList.add('has-bg-image');
+        // 更新預設縮圖選中狀態
+        updateActivePreset(bgUrl);
+    }
+
+    // 清除背景
+    function clearBackground() {
+        body.style.removeProperty('--bg-image');
+        body.classList.remove('has-bg-image');
+        // 歸復預設頂部選中
+        const noBgThumb = presetStrip ? presetStrip.querySelector('[data-preset="none"]') : null;
+        if (noBgThumb) setActiveThumb(noBgThumb);
+    }
+
+    // 新增縮圖到預設列
+    function addToPresetStrip(bgUrl, makeActive) {
+        if (!presetStrip) return;
+        // 如果已存在相同 URL 則不重複添加
+        const existing = presetStrip.querySelector(`[data-preset="${CSS.escape(bgUrl)}"]`);
+        if (existing) {
+            if (makeActive) setActiveThumb(existing);
+            return;
+        }
+        const thumb = document.createElement('div');
+        thumb.className = 'bg-preset-thumb';
+        thumb.dataset.preset = bgUrl;
+        thumb.style.backgroundImage = `url('${bgUrl}')`;
+        thumb.setAttribute('role', 'button');
+        thumb.setAttribute('tabindex', '0');
+        thumb.addEventListener('click', () => {
+            pendingBgUrl = bgUrl;
+            setActiveThumb(thumb);
+        });
+        presetStrip.appendChild(thumb);
+        if (makeActive) setActiveThumb(thumb);
+    }
+
+    // 更新預設縮圖選中狀態
+    function updateActivePreset(bgUrl) {
+        if (!presetStrip) return;
+        const thumb = presetStrip.querySelector(`[data-preset="${CSS.escape(bgUrl)}"]`);
+        if (thumb) {
+            setActiveThumb(thumb);
+        } else {
+            // 如果沒有對應縮圖，新增一個
+            addToPresetStrip(bgUrl, true);
+        }
+    }
+
+    function setActiveThumb(activeThumb) {
+        if (!presetStrip) return;
+        presetStrip.querySelectorAll('.bg-preset-thumb').forEach(t => t.classList.remove('active'));
+        activeThumb.classList.add('active');
+    }
+
+    // 預設縮圖點擊事件—「無背景」預設
+    const noBgThumb = presetStrip ? presetStrip.querySelector('[data-preset="none"]') : null;
+    if (noBgThumb) {
+        noBgThumb.addEventListener('click', function () {
+            pendingBgUrl = null;
+            if (urlInput) urlInput.value = '';
+            setActiveThumb(noBgThumb);
+        });
+    }
+
+    // 如果已有儲存的背景，將其加入縮圖列
+    if (savedBg) {
+        addToPresetStrip(savedBg, true);
+    } else {
+        if (noBgThumb) noBgThumb.classList.add('active');
+    }
+})();
