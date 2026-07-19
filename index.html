@@ -205,5 +205,46 @@
 
     <script src="data.js"></script>
     <script src="app.js"></script>
+
+    <!-- 背景設定按鈕 (Background Setting Button) -->
+    <button id="btn-bg-setting" class="bg-setting-btn" aria-label="背景設定" title="更改背景">&#128444;</button>
+
+    <!-- 背景設定面板遮罩層 -->
+    <div id="bg-setting-overlay" class="bg-setting-overlay"></div>
+
+    <!-- 背景設定抽屜面板 -->
+    <div id="bg-setting-panel" class="bg-setting-panel" role="dialog" aria-label="背景設定">
+        <h3>&#127774; 背景設定</h3>
+
+        <!-- 預設背景縮圖列 -->
+        <div class="bg-preview-strip" id="bg-preset-strip">
+            <div class="bg-preset-thumb no-bg active" data-preset="none" role="button" tabindex="0" aria-label="無背景">無背景</div>
+        </div>
+
+        <!-- 上傳圖片 -->
+        <div class="bg-setting-panel-row">
+            <label for="bg-file-input">圖片</label>
+            <input type="file" id="bg-file-input" class="bg-file-input" accept="image/*" aria-label="選擇背景圖片">
+        </div>
+
+        <!-- 輸入圖片 URL -->
+        <div class="bg-setting-panel-row">
+            <label for="bg-url-input">URL</label>
+            <input type="url" id="bg-url-input" class="bg-url-input" placeholder="https://example.com/image.jpg" aria-label="圖片連結">
+        </div>
+
+        <!-- 遠明度滑桿 -->
+        <div class="bg-overlay-row">
+            <label for="bg-overlay-slider">遠明度</label>
+            <input type="range" id="bg-overlay-slider" class="bg-overlay-slider" min="0" max="0.85" step="0.05" value="0.45" aria-label="遮罩遠明度">
+            <span class="bg-overlay-value" id="bg-overlay-value">45%</span>
+        </div>
+
+        <!-- 操作按鈕 -->
+        <div class="bg-setting-actions">
+            <button class="bg-btn-clear" id="bg-btn-clear">清除背景</button>
+            <button class="bg-btn-apply" id="bg-btn-apply">套用</button>
+        </div>
+    </div>
 </body>
 </html>
