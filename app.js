@@ -238,7 +238,7 @@ function applyViewMode(mode) {
         const opacity = parseFloat(localStorage.getItem('marketday_bg_opacity') || '0.45');
         document.body.style.setProperty('--bg-image', `url('${defaultBg}')`);
         document.body.style.setProperty('--bg-overlay-opacity', opacity);
-        document.body.classList.add('has-bg-image');
+        document.body.classList.add('has-bg-image'); const dc = document.querySelector('.device-content'); if (dc) { dc.style.backgroundImage = `url('${defaultBg}')`; }
     }
 }
 
