@@ -68,8 +68,8 @@ body.view-phone {
 }
 
 body.view-laptop {
-    --device-width: min(1180px, 100%);
-    --device-height: min(820px, calc(100dvh - 92px));
+    --device-width: min(860px, 100%);
+    --device-height: min(680px, calc(100dvh - 92px));
     --frame-radius: 30px;
     --frame-padding: 12px;
     --frame-gap: 8px;
